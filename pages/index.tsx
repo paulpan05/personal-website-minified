@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
-import Image from 'next/image'
 import Head from 'next/head'
-import ProfilePicture from '../public/profile_picture.jpg'
+import Header from '../components/Header'
 
 const Home: NextPage = () => {
   return (
@@ -14,9 +13,7 @@ const Home: NextPage = () => {
         <link rel='apple-touch-icon' href='/apple-touch-icon.png' />
         <link rel='manifest' href='/manifest.json' />
       </Head>
-      <h1>Hi everyone! I&apos;m Paul.</h1>
-      <h2>Welcome to my homepage!</h2>
-      <Image src={ProfilePicture} alt='Profile Picture' />
+      <Header />
     </>
   )
 }
