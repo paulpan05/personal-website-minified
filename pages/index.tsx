@@ -1,5 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import styles from './index.module.scss'
+import About from '../components/About'
 import Header from '../components/Header'
 
 const Home: NextPage = () => {
@@ -14,6 +16,9 @@ const Home: NextPage = () => {
         <link rel='manifest' href='/manifest.json' />
       </Head>
       <Header />
+      <div className={styles['content']}>
+        <About />
+      </div>
     </>
   )
 }

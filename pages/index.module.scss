@@ -1,0 +1,14 @@
+.content {
+  background-image: url('/image/shooting_star.svg');
+  color: white;
+}
+
+.content > * {
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+}
+
+.content > * > * {
+  align-self: center;
+}
