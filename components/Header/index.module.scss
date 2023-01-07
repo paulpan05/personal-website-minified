@@ -1,3 +1,18 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+}
+
+.header > * {
+  align-self: center;
+}
+
+.header > *:nth-child(2) {
+  padding-top: .5em;
+}
+
 .profile-image {
+  vertical-align: middle;
   border-radius: 50%;
 }
