@@ -6,7 +6,7 @@ export const AboutMe = (
     apps). I have also developed full-stack web applications with Node.js,
     React, and Next.js. One of the projects I am doing outside of work is a
     hardware-agnostic parallel computing library written in C++, Objective-C,
-    and CUDA, as I am interested in HPC research.
+    and CUDA, as I am interested to learn more about the area of HPC.
   </p>
 );
 
