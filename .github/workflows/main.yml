@@ -34,7 +34,7 @@ jobs:
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/arm_server
             chmod 600 ~/.ssh/arm_server
             rsync -e "ssh -i ~/.ssh/arm_server" -av personal-website/ root@arm.paulurl.com:/usr/share/nginx/personal-website/
-            ssh -i ~/.ssh/arm_server root@arm.paulurl.com "cd /usr/share/nginx/personal-website; pnpm install; pnpm build"
+            ssh -i ~/.ssh/arm_server root@arm.paulurl.com "cd /usr/share/nginx/personal-website; pnpm install; pnpm build; systemctl restart personal-website.service"
         env:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
             SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
