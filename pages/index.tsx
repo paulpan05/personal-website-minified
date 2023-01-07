@@ -3,6 +3,7 @@ import Head from 'next/head'
 import styles from './index.module.scss'
 import About from '../components/About'
 import Header from '../components/Header'
+import Experience from '../components/Experience'
 
 const Home: NextPage = () => {
   return (
@@ -18,6 +19,7 @@ const Home: NextPage = () => {
       <Header />
       <div className={styles['content']}>
         <About />
+        <Experience />
       </div>
     </>
   )
