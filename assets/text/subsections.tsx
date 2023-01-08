@@ -1,4 +1,4 @@
-export const Experience = [
+export const ExperienceCards = [
   {
     logo: "/image/Meta_Platforms_Inc._logo.svg",
     company: "Meta",
@@ -62,7 +62,7 @@ export const Experience = [
   },
 ];
 
-export const HighlightedProjects = [
+export const HighlightedProjectsCards = [
   {
     short_description: "numvk and numgpu",
     medium_description:

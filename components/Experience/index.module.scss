@@ -2,3 +2,16 @@
   background-image: linear-gradient(#cabd80, #e1ceb1);
   color: black;
 }
+
+.experience > *:nth-child(n + 3) {
+  margin-top: 2em;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card > * {
+  align-self: center;
+}
