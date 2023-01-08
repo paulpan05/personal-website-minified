@@ -4,6 +4,7 @@ import styles from './index.module.scss'
 import About from '../components/About'
 import Header from '../components/Header'
 import Experience from '../components/Experience'
+import HighlightedProjects from '../components/HighlightedProjects'
 
 const Home: NextPage = () => {
   return (
@@ -20,6 +21,7 @@ const Home: NextPage = () => {
       <div className={styles['content']}>
         <About />
         <Experience />
+        <HighlightedProjects />
       </div>
     </>
   )

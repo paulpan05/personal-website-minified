@@ -11,6 +11,7 @@ const Experience: NextComponentType = () => {
         <div className={styles['card']} key={index}>
           <Image src={card.logo} alt={card.company} width={250} height={250} />
           <h3>{card.role}</h3>
+          <h4>{card.employment_time}</h4>
           {card.description}
         </div>
       ))}

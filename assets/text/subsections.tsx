@@ -126,7 +126,7 @@ export const HighlightedProjectsCards = [
         </p>
         <p>
           <b>Links: </b>
-          <a href="https://github.com/paulpan05/mlp-theano"></a>
+          <a href="https://github.com/paulpan05/mlp-theano">mlp-theano</a>
         </p>
       </>
     ),
