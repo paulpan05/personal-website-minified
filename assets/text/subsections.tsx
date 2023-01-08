@@ -13,8 +13,7 @@ export const Experience = [
           along with understanding system apps development. I am also
           implementing the syncing mechanism between the iOS phone app and
           another device, which requires me to have a better understanding of
-          how to debug in both iOS and Android (including how to read into
-          SQLite database files).
+          how to debug iOS, Android, and SQLite tables.
         </p>
         <br />
         <br />
@@ -40,7 +39,13 @@ export const Experience = [
     role: "Software Development Engineer Intern",
     description: (
       <>
-        <p></p>
+        <p>
+          I worked on an internal tool which helps developers automatically be
+          granted IAM permissions based on the types of data they are requesting
+          / the team they are in. Throughout the internship, I learned how to
+          provision server instances at various stages in the pipeline, along
+          with how to develop server-side rendered webpages.
+        </p>
         <br />
         <br />
         <p>
@@ -48,6 +53,9 @@ export const Experience = [
         </p>
         <p>
           <b>Frameworks and Databases: </b>Ruby on Rails, PostgreSQL
+        </p>
+        <p>
+          <b>Tools: </b>Amazon S3, Amazon RDS
         </p>
       </>
     ),
