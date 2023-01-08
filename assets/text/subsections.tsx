@@ -90,6 +90,15 @@ export const HighlightedProjects = [
         <p>
           <b>Build Tools: </b>CMake, Ninja, XCode
         </p>
+        <p>
+          <b>Links: </b>
+          <a href="https://gitlab.com/paulpan05/vulkan-numeric-libraries">
+            numvk
+          </a>{" "}
+          <a href="https://gitlab.com/paulpan05/gpu-compute-libraries">
+            numgpu
+          </a>
+        </p>
       </>
     ),
   },
@@ -114,6 +123,10 @@ export const HighlightedProjects = [
         </p>
         <p>
           <b>Libraries: </b>Theano
+        </p>
+        <p>
+          <b>Links: </b>
+          <a href="https://github.com/paulpan05/mlp-theano"></a>
         </p>
       </>
     ),
