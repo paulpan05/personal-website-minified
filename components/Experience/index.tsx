@@ -3,7 +3,7 @@ import styles from "./index.module.scss";
 
 const Experience: NextComponentType = () => {
   return (
-    <div>
+    <div className={styles['experience']}>
       <h2>Experience</h2>
     </div>
   );
