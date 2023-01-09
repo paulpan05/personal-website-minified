@@ -20,3 +20,7 @@ export const ProfileIconLinks = [
     link: 'https://devpost.com/paulpan05'
   },
 ];
+
+export const OldEmail = 'panjunhong05@gmail.com'
+export const NewEmail = 'personal@panpaul.com'
+export const PhoneNumber = '+16266918088'

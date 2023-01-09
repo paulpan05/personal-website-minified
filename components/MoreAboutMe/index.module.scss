@@ -1,0 +1,12 @@
+.profile {
+  background-color: darkslategray;
+}
+
+.profile > *:nth-child(n + 2) {
+  margin-top: 1em;
+}
+
+.profile-links > * {
+  margin-left: 1em;
+  margin-right: 1em;
+}

@@ -5,6 +5,7 @@ import About from '../components/About'
 import Header from '../components/Header'
 import Experience from '../components/Experience'
 import HighlightedProjects from '../components/HighlightedProjects'
+import MoreAboutMe from '../components/MoreAboutMe'
 
 const Home: NextPage = () => {
   return (
@@ -22,6 +23,7 @@ const Home: NextPage = () => {
         <About />
         <Experience />
         <HighlightedProjects />
+        <MoreAboutMe />
       </div>
     </>
   )
