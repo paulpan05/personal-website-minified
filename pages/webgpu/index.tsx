@@ -1,8 +1,8 @@
-import type { NextComponentType } from 'next'
+import type { NextPage } from 'next'
 import { setupWebGPUDevice } from './src/utils';
 import { useEffect } from 'react';
 
-const WebGPU: NextComponentType = () => {
+const WebGPU: NextPage = () => {
   useEffect(() => {
     setupWebGPUDevice().then((device) => {
       console.log(device);
