@@ -1,11 +1,11 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from './index.module.scss'
-import About from '../components/About'
-import Header from '../components/Header'
-import Experience from '../components/Experience'
-import HighlightedProjects from '../components/HighlightedProjects'
-import MoreAboutMe from '../components/MoreAboutMe'
+import About from './components/About'
+import Header from './components/Header'
+import Experience from './components/Experience'
+import HighlightedProjects from './components/HighlightedProjects'
+import MoreAboutMe from './components/MoreAboutMe'
 
 const Home: NextPage = () => {
   return (
