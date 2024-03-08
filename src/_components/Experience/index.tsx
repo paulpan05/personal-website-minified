@@ -1,7 +1,7 @@
 import type { NextComponentType } from "next";
 import Image from "next/image";
 import styles from "./index.module.scss";
-import { ExperienceCards } from "../../assets/text/subsections";
+import { ExperienceCards } from "../../_assets/text/subsections";
 
 const Experience: NextComponentType = () => {
   return (

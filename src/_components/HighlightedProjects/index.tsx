@@ -1,6 +1,6 @@
 import type { NextComponentType } from "next";
 import styles from "./index.module.scss";
-import { HighlightedProjectsCards } from "../../assets/text/subsections";
+import { HighlightedProjectsCards } from "../../_assets/text/subsections";
 
 const HighlightedProjects: NextComponentType = () => {
   return (

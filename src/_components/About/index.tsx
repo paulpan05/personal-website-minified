@@ -1,6 +1,6 @@
 import type { NextComponentType } from 'next'
 import styles from './index.module.scss'
-import {AboutMe, AboutThisSite} from '../../assets/text/paragraphs';
+import {AboutMe, AboutThisSite} from '../../_assets/text/paragraphs';
 
 const About: NextComponentType = () => {
   return (

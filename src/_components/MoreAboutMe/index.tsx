@@ -1,8 +1,8 @@
 import type { NextComponentType } from "next";
 import Image from "next/image";
 import styles from "./index.module.scss";
-import { ProfileIconLinks } from "../../assets/text/infos";
-import { OldEmail, NewEmail, PhoneNumber } from "../../assets/text/infos";
+import { ProfileIconLinks } from "../../_assets/text/infos";
+import { OldEmail, NewEmail, PhoneNumber } from "../../_assets/text/infos";
 
 const MoreAboutMe: NextComponentType = () => {
   return (

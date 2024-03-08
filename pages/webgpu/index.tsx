@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { setupWebGPUDevice } from './src/utils';
+import { setupWebGPUDevice } from '../../src/webgpu/_utils/utils';
 import { useEffect } from 'react';
 
 const WebGPU: NextPage = () => {
