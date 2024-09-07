@@ -7,24 +7,15 @@ export const ExperienceCards = [
     description: (
       <>
         <p>
-          Most of my work at Meta&apos;s Reality Labs involves improving
-          devices&apos; update / data syncing mechanisms. This involves
-          understanding Android API&apos;s UpdateManager and PackageManager,
-          along with understanding system apps development. I am also
-          implementing the syncing mechanism between the iOS phone app and
-          another device, which requires me to have a better understanding of
-          how to debug iOS, Android, and SQLite tables.
+          Currently working on the Meta View App. Previously on device updates and frameworks.
         </p>
         <br />
         <br />
         <p>
-          <b>Programming Languages: </b>Kotlin, Java, Swift, Hack
+          <b>Programming Languages: </b>Kotlin, Java, Hack, Swift, Objective-C, C++
         </p>
         <p>
-          <b>Databases: </b>SQLite
-        </p>
-        <p>
-          <b>Tools: </b>DB Browser for SQLite, adb
+          <b>Query Languages: </b>SQLite, Presto
         </p>
         <p>
           <b>Debugging IDEs: </b>XCode, Android Studio, Visual Studio Code
