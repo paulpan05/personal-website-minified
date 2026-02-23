@@ -1,0 +1,44 @@
+.container {
+  background-image: url('/image/endless-constellation.svg');
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2em 1em;
+}
+
+.content {
+  max-width: 800px;
+  width: 100%;
+}
+
+.content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5em;
+}
+
+.content h2 {
+  font-size: 1.5rem;
+  margin-top: 1.5em;
+  margin-bottom: 0.25em;
+}
+
+.content p {
+  max-width: 100%;
+  line-height: 1.6;
+}
+
+.content ul {
+  padding-left: 1.5em;
+  padding-top: 0.5em;
+}
+
+.content li {
+  padding-top: 0.25em;
+  line-height: 1.6;
+}
+
+.backLink {
+  margin-top: 2em;
+}
