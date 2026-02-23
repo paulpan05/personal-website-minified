@@ -1,6 +1,5 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Link from 'next/link'
 import styles from './bibledevos.module.scss'
 
 const Privacy: NextPage = () => {
@@ -92,10 +91,6 @@ const Privacy: NextPage = () => {
             If you have questions about this privacy policy, contact us at{' '}
             <a href='mailto:professional@panpaul.com'>professional@panpaul.com</a>.
           </p>
-
-          <div className={styles.backLink}>
-            <Link href='/'>&#8592; Back to home</Link>
-          </div>
         </div>
       </div>
     </>
