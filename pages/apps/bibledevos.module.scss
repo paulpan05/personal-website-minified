@@ -1,0 +1,75 @@
+.container {
+  background-image: url('/image/endless-constellation.svg');
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2em 1em;
+}
+
+.content {
+  max-width: 800px;
+  width: 100%;
+}
+
+.content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.25em;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  opacity: 0.85;
+  margin-bottom: 1.5em;
+}
+
+.content h2 {
+  font-size: 1.5rem;
+  margin-top: 1.5em;
+  margin-bottom: 0.25em;
+}
+
+.content p {
+  max-width: 100%;
+  line-height: 1.6;
+}
+
+.content ul {
+  padding-left: 1.5em;
+  padding-top: 0.5em;
+}
+
+.content li {
+  padding-top: 0.25em;
+  line-height: 1.6;
+}
+
+.badges {
+  display: flex;
+  gap: 1em;
+  margin-top: 1.5em;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.6em 1.4em;
+  border: 1px solid white;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+
+.badge:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.links {
+  margin-top: 2em;
+  display: flex;
+  gap: 1.5em;
+  flex-wrap: wrap;
+}
