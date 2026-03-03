@@ -35,7 +35,7 @@ jobs:
             chmod 600 ~/.ssh/arm_server
             ssh -i ~/.ssh/arm_server root@arm.paulurl.com "rm -rf /usr/share/nginx/personal-website"
             rsync -e "ssh -i ~/.ssh/arm_server" -av personal-website/ root@arm.paulurl.com:/usr/share/nginx/personal-website/
-            ssh -i ~/.ssh/arm_server root@arm.paulurl.com "cd /usr/share/nginx/personal-website; pnpm install; pnpm build; systemctl restart personal-website.service"
+            ssh -i ~/.ssh/arm_server root@arm.paulurl.com "cd /usr/share/nginx/personal-website; npm install; npm run build; systemctl restart personal-website.service"
         env:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
             SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
