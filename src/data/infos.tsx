@@ -23,4 +23,4 @@ export const ProfileIconLinks = [
 
 export const OldEmail = 'panjunhong05@gmail.com'
 export const NewEmail = 'personal@panpaul.com'
-export const PhoneNumber = '+16266918088'
+export const PhoneNumber = '+1 (617) 862-8515'

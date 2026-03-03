@@ -13,10 +13,7 @@ export const AboutMe = (
 export const AboutThisSite = (
   <>
     <p>
-      This website is developed with Next.js. The production website&apos;s
-      server is running as a systemd service on an Oracle Cloud Instance. The
-      systemd service is backed by a Nginx reverse proxy, which directs traffic
-      to the Next.js server if the domain name matches panpaul.com
+      This website is developed with Next.js and deployed to Cloudflare Workers.
     </p>
     <br />
     <br />

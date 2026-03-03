@@ -6,22 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
   },
   "dependencies": {
-    "next": "12.1.6",
-    "react": "18.1.0",
-    "react-dom": "18.1.0",
-    "sharp": "^0.31.3"
+    "@opennextjs/cloudflare": "^1.17.1",
+    "next": "^15.3.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@types/node": "17.0.35",
-    "@types/react": "18.0.9",
-    "@types/react-dom": "18.0.4",
-    "@webgpu/types": "^0.1.44",
-    "eslint": "8.16.0",
-    "eslint-config-next": "12.1.6",
-    "sass": "^1.78.0",
-    "typescript": "4.6.4"
+    "@types/node": "^20.19.33",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "^15.3.5",
+    "sass": "^1.89.0",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.68.1"
   }
 }

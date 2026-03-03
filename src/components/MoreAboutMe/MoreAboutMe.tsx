@@ -1,14 +1,12 @@
-import type { NextComponentType } from "next";
-import Image from "next/image";
-import styles from "./index.module.scss";
-import { ProfileIconLinks } from "../../_assets/text/infos";
-import { OldEmail, NewEmail, PhoneNumber } from "../../_assets/text/infos";
+import Image from 'next/image'
+import styles from './MoreAboutMe.module.scss'
+import { ProfileIconLinks, OldEmail, NewEmail, PhoneNumber } from '@/data/infos'
 
-const MoreAboutMe: NextComponentType = () => {
+export default function MoreAboutMe() {
   return (
-    <div className={styles["profile"]}>
+    <div className={styles.profile}>
       <h2>More About Me</h2>
-      <div className={styles["profile-links"]}>
+      <div className={styles['profile-links']}>
         {ProfileIconLinks.map((profile, index) => (
           <a key={index} href={profile.link}>
             <Image
@@ -24,7 +22,5 @@ const MoreAboutMe: NextComponentType = () => {
       <p><b>New Email: </b><a href={`mailto:${NewEmail}`}>{NewEmail}</a></p>
       <p><b>Phone Number: </b><a href={`tel:${PhoneNumber}`}>{PhoneNumber}</a></p>
     </div>
-  );
-};
-
-export default MoreAboutMe;
+  )
+}
