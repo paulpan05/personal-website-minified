@@ -1,0 +1,89 @@
+// Page Content
+.content {
+  background-image: url('/image/endless-constellation.svg');
+  color: white;
+
+  > * {
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+  }
+
+  > *:nth-child(n + 2) {
+    padding-top: 2em;
+  }
+
+  > * > * {
+    align-self: center;
+  }
+}
+
+// Header Component
+.header {
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  background-image: linear-gradient(#fde0d9, #fff2cc);
+  text-align: center;
+
+  > * {
+    align-self: center;
+  }
+
+  > *:nth-child(2) {
+    padding-top: 0.5em;
+  }
+}
+
+.profile-image {
+  vertical-align: middle;
+  border-radius: 50%;
+}
+
+// About Component
+.about > h3 {
+  padding-top: 0.5em;
+}
+
+// Experience Component
+.experience {
+  background-image: linear-gradient(#cabd80, #e1ceb1);
+  color: black;
+
+  > *:nth-child(n + 3) {
+    margin-top: 2em;
+  }
+}
+
+// Shared Card Styles
+.card {
+  display: flex;
+  flex-direction: column;
+
+  > * {
+    align-self: center;
+  }
+
+  > h3 {
+    padding-top: 0.5em;
+  }
+}
+
+// Highlighted Projects Component
+.highlighted-projects > *:nth-child(n + 3) {
+  margin-top: 2em;
+}
+
+// More About Me Component
+.profile {
+  background-color: darkslategray;
+
+  > *:nth-child(n + 2) {
+    margin-top: 1em;
+  }
+}
+
+.profile-links > * {
+  margin-left: 1em;
+  margin-right: 1em;
+}

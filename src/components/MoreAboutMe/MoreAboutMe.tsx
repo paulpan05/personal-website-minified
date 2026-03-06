@@ -1,12 +1,11 @@
 import Image from 'next/image'
-import styles from './MoreAboutMe.module.scss'
 import { ProfileIconLinks, OldEmail, NewEmail, PhoneNumber } from '@/data/infos'
 
 export default function MoreAboutMe() {
   return (
-    <div className={styles.profile}>
+    <div className="profile">
       <h2>More About Me</h2>
-      <div className={styles['profile-links']}>
+      <div className="profile-links">
         {ProfileIconLinks.map((profile, index) => (
           <a key={index} href={profile.link}>
             <Image

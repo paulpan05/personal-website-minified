@@ -1,14 +1,19 @@
-import styles from './About.module.scss'
-import { AboutMe, AboutThisSite } from '@/data/paragraphs'
+import { aboutMeText, aboutThisSiteText, repoLink } from '@/data/paragraphs'
 
 export default function About() {
   return (
-    <div className={styles.about}>
+    <div className="about">
       <h2>About</h2>
       <h3>Me</h3>
-      {AboutMe}
+      <p>{aboutMeText}</p>
       <h3>This site</h3>
-      {AboutThisSite}
+      <p>{aboutThisSiteText}</p>
+      <br />
+      <br />
+      <p>
+        <b>Repo Link: </b>
+        <a href={repoLink}>personal-website-minified</a>
+      </p>
     </div>
   )
 }
