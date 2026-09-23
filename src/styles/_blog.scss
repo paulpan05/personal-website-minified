@@ -1,0 +1,147 @@
+@use 'tokens' as *;
+
+// Blog pages and homepage Writing section.
+.blog {
+  background-color: $blog-bg;
+  color: $blog-ink;
+  min-height: 100vh;
+  padding: 1em;
+
+  a {
+    color: $link-on-dark;
+  }
+
+  a:visited {
+    color: $link-on-dark;
+  }
+
+  > * {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.blog-index h1,
+.blog-post h1 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.blog-list {
+  list-style: none;
+  padding-left: 0;
+
+  > li {
+    margin-top: 2em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+}
+
+.blog-meta,
+.blog-tags {
+  color: $blog-muted;
+  font-size: 1rem;
+  padding-top: 0.5em;
+}
+
+.blog-post {
+  font-size: 1.125rem;
+  padding-bottom: 3em;
+
+  header {
+    margin-bottom: 1em;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    margin-top: 1.5em;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+    margin-top: 1.5em;
+  }
+
+  p,
+  ul,
+  ol {
+    max-width: 70ch;
+    line-height: 1.7;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.5em;
+  }
+
+  li {
+    margin-top: 0.5em;
+  }
+
+  blockquote {
+    border-left: 3px solid $link-on-dark;
+    margin-left: 0;
+    padding-left: 1em;
+    color: $blog-blockquote-ink;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin-top: 1.5em;
+    font-size: 0.95em;
+  }
+
+  th,
+  td {
+    border: 1px solid $blog-table-border;
+    padding: 0.5em 0.75em;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: $blog-th-bg;
+  }
+
+  pre {
+    overflow-x: auto;
+    background-color: $blog-pre-bg;
+    border: 1px solid $blog-pre-border;
+    padding: 1em;
+    margin-top: 1.5em;
+    font-size: 0.95em;
+    line-height: 1.5;
+  }
+
+  code {
+    font-family: "Lucida Console", "Courier New", monospace;
+  }
+
+  :not(pre) > code {
+    background-color: $blog-code-bg;
+    padding: 0.15em 0.4em;
+  }
+
+  hr {
+    margin-top: 2em;
+    border-color: $blog-hr;
+  }
+}
+
+// Homepage Writing section (inside the light-on-dark .content wrapper).
+.writing-list {
+  list-style: none;
+  padding-left: 0;
+
+  > li {
+    margin-top: 1em;
+  }
+}

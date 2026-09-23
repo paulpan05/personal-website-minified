@@ -1,22 +1,24 @@
 import '@/styles/reset.scss'
 import '@/styles/globals.scss'
 import type { Metadata } from 'next'
+import { SITE_URL } from '@/lib/site'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Paul's Main Website",
   description:
-    "Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, and contact info.",
+    'Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, writing, and contact info.',
   openGraph: {
     title: "Paul's Main Website",
     description:
-      "Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, and contact info.",
+      "Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, writing, and contact info.",
     type: 'website',
   },
   twitter: {
     card: 'summary',
     title: "Paul's Main Website",
     description:
-      "Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, and contact info.",
+      "Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, writing, and contact info.",
   },
   icons: {
     icon: [
@@ -27,6 +29,11 @@ export const metadata: Metadata = {
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/manifest.json',
+  alternates: {
+    types: {
+      'application/rss+xml': [{ url: '/blog/rss.xml', title: "Writing" }],
+    },
+  },
 }
 
 export default function RootLayout({

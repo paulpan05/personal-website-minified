@@ -1,0 +1,26 @@
+// Site-wide color tokens. All palette values live here; components and
+// pages reference these instead of hardcoding hex values.
+
+// Link colors (chosen for contrast: dark crimson on light pastels,
+// light pink on dark surfaces).
+$link-on-light: #8a0038;
+$link-on-dark: #ffc6d5;
+
+// Homepage section surfaces.
+$header-gradient-start: #fde0d9;
+$header-gradient-end: #fff2cc;
+$experience-gradient-start: #cabd80;
+$experience-gradient-end: #e1ceb1;
+$profile-bg: darkslategray;
+
+// Blog reading environment.
+$blog-bg: #141414;
+$blog-ink: #f2f2f2;
+$blog-muted: #cfcfcf;
+$blog-blockquote-ink: #e2e2e2;
+$blog-th-bg: #242424;
+$blog-table-border: #555;
+$blog-pre-bg: #1e1e1e;
+$blog-pre-border: #333;
+$blog-code-bg: #2a2a2a;
+$blog-hr: #444;

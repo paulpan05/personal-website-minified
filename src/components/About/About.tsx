@@ -8,9 +8,7 @@ export default function About() {
       <p>{aboutMeText}</p>
       <h3>This site</h3>
       <p>{aboutThisSiteText}</p>
-      <br />
-      <br />
-      <p>
+      <p className="meta-block">
         <b>Repo Link: </b>
         <a href={repoLink} target="_blank" rel="noopener noreferrer">personal-website-minified</a>
       </p>

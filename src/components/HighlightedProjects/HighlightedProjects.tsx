@@ -9,9 +9,7 @@ export default function HighlightedProjects() {
           <h3>{card.shortDescription}</h3>
           <h4>{card.mediumDescription}</h4>
           <p>{card.longDescription}</p>
-          <br />
-          <br />
-          <p>
+          <p className="meta-block">
             <b>Links: </b>
             {card.links.map((link, linkIndex) => (
               <span key={linkIndex}>

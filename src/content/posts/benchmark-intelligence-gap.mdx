@@ -1,0 +1,173 @@
+*Longform essay. This position paper argues that AI benchmark scores systematically overstate intelligence when endpoint performance is treated as evidence of fluid or commonsense intelligence — and sketches what honest measurement would require instead.*
+
+## Abstract
+
+This position paper argues that artificial-intelligence benchmark scores systematically overstate intelligence when endpoint performance is treated as evidence of fluid or commonsense intelligence. The error is not that benchmark competence is unreal. It is that most benchmarks measure demonstrated skill on a fixed distribution, whereas fluid intelligence is better understood as efficient skill acquisition under novelty. Three forces widen the discrepancy. First, fixed tasks reward accumulated priors, format familiarity, search, and scaffolding without identifying how much new competence was acquired. Second, once a public benchmark becomes a target, optimization pressure and possible training-data contamination weaken its validity as a proxy for generalization. Third, next-token prediction directly rewards plausible continuation, not the construction and revision of causal world models across sustained interaction. The latter point is an argued interpretation, not an established impossibility result: language models may learn useful world structure, but the objective does not require the forms of grounding, intervention, memory, and planning that commonsense action demands. The ARC-AGI sequence provides the clearest illustration. Near-saturation on static ARC-AGI-1 coexists with sensitivity to harder compositional tasks, interactive evaluation, resource budgets, and agent harnesses. AGENT and culturally grounded language evaluations show that commonsense adds social and situated inference beyond abstract pattern induction. The paper concludes that credible intelligence measurement must evaluate learning curves, novelty, interaction, transfer, contamination resistance, and resource use. Until evaluation measures skill acquisition rather than only skill display, "intelligence" will remain a stronger label than the evidence warrants.
+
+*Keywords: benchmark validity; fluid intelligence; commonsense reasoning; skill acquisition; ARC-AGI; data contamination; Goodhart's law; world models*
+
+## 1. Benchmark success is not yet adaptive intelligence
+
+Artificial intelligence is usually announced through finished performances: a model answers an examination question, solves a programming task, proves a theorem, or transforms a visual grid. These accomplishments matter. They establish that a particular model–prompt–tool system can produce a desired result under a specified protocol. The mistake begins when that result is treated as a direct measurement of intelligence rather than a measurement of task performance.
+
+This paper advances a stronger position than the familiar observation that "benchmarks are imperfect." Its claim is that the dominant evaluation regime contains a systematic construct mismatch. Benchmark intelligence is principally an endpoint quantity: how much skill can be displayed on a known class of tasks after large-scale pretraining and repeated community optimization. Fluid intelligence is a process quantity: how efficiently a system turns limited experience into a new skill when task structure is unfamiliar. Commonsense intelligence adds the capacity to form and revise models of objects, agents, causes, norms, and consequences over time. A single accuracy figure can reflect the first quantity while revealing little about the other two.
+
+Chollet's (2019) distinction between skill and skill-acquisition efficiency gives this discrepancy a precise lens. A stock of skills can be produced by intelligence, but also by extensive prior exposure, task-specific engineering, brute-force search, or a verifier that selects a correct answer from many attempts. Intelligence, on this account, concerns the efficiency with which a learner converts priors and experience into competence across tasks of controlled novelty and difficulty. The relevant question is therefore not only "What score did the system obtain?" but "What did it already know, what feedback did it receive, how much computation did it spend, and how far did the acquired procedure transfer?"
+
+The Cattell–Horn distinction between crystallized and fluid intelligence offers a useful analogy. Crystallized ability concerns accumulated knowledge and practiced procedures; fluid ability concerns reasoning in novel situations (Cattell, 1963). Applied to machines, this is an interpretive vocabulary rather than a claim that language models instantiate human psychometric factors. A pretrained model's command of facts, genres, and recurring solution forms resembles crystallized competence. Inferring an unfamiliar rule from sparse evidence, testing a hypothesis, and changing course after failure resembles fluid reasoning. The analogy is valuable precisely because it exposes what a benchmark may confound: retained competence can be mistaken for adaptive intelligence.
+
+The central thesis is thus conditional but consequential: when benchmark scores are reported as evidence of intelligence, they tend to overstate fluid and commonsense capability because the evaluation usually rewards the product of prior optimization more than the efficiency of new learning. This is an argued position supported by the evidence below, not a settled consensus. It does not deny the practical power of frontier systems, nor does it claim that scale cannot improve reasoning. It claims that the standard inference from score to intelligence is stronger than the measurement permits.
+
+## 2. Fixed benchmarks measure optimized competence
+
+### 2.1 A fixed test asks for performance, not adaptation
+
+A benchmark is a sample from a specified distribution with a scoring rule. That structure is necessary for comparison, but it also limits the inference that can be drawn. If task families, answer formats, prompting conventions, or evaluator preferences become familiar, higher scores can follow from better adaptation to the benchmark ecosystem rather than a domain-general increase in learning efficiency. Even a private test split may remain close to public examples in latent structure. The model can then exploit relevant priors without acquiring much during the evaluation itself.
+
+This is not "mere memorization" in every case. Pretraining can produce abstractions that transfer legitimately, and a well-designed task can reveal them. The point is measurement-theoretic: endpoint accuracy does not identify the source of competence. It does not separate reusable abstraction from template familiarity, latent exposure, search, tool use, or task-specific scaffolding. Two systems can receive the same score while differing radically in the amount of relevant prior information and test-time experience they required.
+
+The discrepancy becomes clearer under distribution shift. A fixed benchmark estimates performance on its own distribution; fluid intelligence concerns the slope of adaptation as the distribution changes. Chollet's framework makes "generalization difficulty" part of the construct rather than an inconvenience to be averaged away. If a test never forces a learner outside familiar structure, it cannot establish efficient novel-task learning no matter how difficult its items are for people. A harder examination can still test crystallized competence if its form and content are richly represented in training.
+
+### 2.2 Optimization pressure degrades the score as a proxy
+
+Public benchmarks are not passive instruments. They shape model selection, synthetic-data generation, prompting strategies, inference systems, and marketing. Once a score becomes a target, effort is directed toward whatever raises it. Manheim and Garrabrant's (2018) taxonomy of Goodhart effects explains why a proxy can become less reliable under strong optimization: selection can exploit noise, push the system into regions where the proxy–goal relationship changes, or create direct incentives to game the measure.
+
+In AI evaluation, no deliberate cheating is required. Laboratories study public leaderboards, tune model behavior to recurring task formats, build verifiers around exact-answer domains, and choose inference budgets that maximize reported results. Each intervention may be valid engineering. Together, however, they change the meaning of the score. A benchmark originally intended to sample a capability becomes part of the training and product-development environment. The score increasingly measures the joint system's optimization against that target.
+
+This is why benchmark saturation is ambiguous. It may reflect a genuine advance in representations and reasoning; it may also reflect increasing specialization to the test's regularities. Usually it reflects some combination. The proper response is not to dismiss the result, but to narrow the claim: the system has achieved high performance under this protocol. General intelligence remains a further hypothesis requiring evidence under changed conditions.
+
+### 2.3 Contamination converts generalization evidence into exposure evidence
+
+Training-data contamination is the sharpest version of this problem. If test items or close variants enter pretraining or fine-tuning corpora, evaluation no longer cleanly measures transfer to unseen material. Deng et al. (2023) combined retrieval analysis with "test-set slot guessing," asking models to reconstruct masked, unlikely content from benchmark items. On MMLU, ChatGPT and GPT-4 exactly reconstructed missing answer options at reported rates of 52% and 57%. Those findings do not prove that every correct MMLU response was memorized, and contamination detection for closed models remains uncertain. They do establish that public-test familiarity can be strong enough to threaten a naïve interpretation of benchmark accuracy.
+
+Contamination should therefore be treated as a measurement problem, not an accusation about intent. Web-scale corpora can absorb public datasets accidentally; derivative explanations, answer keys, and synthetic examples can propagate them further. More importantly, the absence of detected verbatim overlap does not prove independence, because semantic variants and reconstructed items may preserve the relevant solution. A static public benchmark becomes progressively less capable of distinguishing retrieval from generalization as it circulates.
+
+Optimization pressure and contamination interact. Goodhart's law predicts that when a proxy is repeatedly optimized, more of the improvement can occur through channels peculiar to the proxy. Contamination supplies one such channel; tailored prompting, specialized search, and benchmark-specific synthetic data supply others. The result is an asymmetry: scores can improve without a proportional improvement in skill-acquisition efficiency. That is the first reason benchmark intelligence overstates fluid intelligence.
+
+## 3. The discrepancy appears when novelty becomes the task
+
+### 3.1 The ARC-AGI sequence changes the construct, not merely the difficulty
+
+The Abstraction and Reasoning Corpus (ARC) was created to emphasize sparse-example rule induction rather than factual recall. ARC-AGI-1 presents small colored grids with a few input–output demonstrations; a solver must infer the transformation and apply it to a new case. ARC-AGI-2 raises compositional difficulty and resistance to superficial search. ARC-AGI-3 moves from static transformations to 135 instruction-light, turn-based environments in which an agent must discover mechanics and objectives through action (ARC Prize Foundation, 2026b).
+
+These versions should not be read as three rungs on one difficulty ladder. They progressively alter what is measured. Static grids reward object representation, analogy, segmentation, and rule induction. Harder grids require composition. Interactive environments additionally demand exploratory action, state tracking, causal hypothesis formation, goal inference, planning, and recovery from error. ARC-AGI-3 therefore moves closer to the process that the skill-acquisition account calls intelligence: acquiring a workable model while the task unfolds.
+
+**Table 1. ARC-AGI generations expose the benchmark–intelligence discrepancy**
+
+| Version | Evaluation regime | AI snapshot | Measurement lesson |
+| --- | --- | --- | --- |
+| ARC-AGI-1 | Static few-shot rules | 93.0% (Feb. 2026); 97.5–98.5% (Sept.) | Near ceiling does not establish generality |
+| ARC-AGI-2 | Harder composition | 24.03% (2025); 68.8% (Feb.); up to 95.0% (Sept.) | A redesign restores diagnostic headroom |
+| ARC-AGI-3 | Interactive discovery | &lt;1% at launch; 62.7% Standard (Sept.) | Novelty and harness change the result |
+
+Sources by row. ARC-AGI-1: 93.0%—Vahdati et al. (2026); 97.5–98.5%—secondary reporting of the verified public-evaluation leaderboard (lower evidence tier). ARC-AGI-2: 24.03%—ARC Prize Foundation (2026a); 68.8%—Vahdati et al. (2026); up to 95.0%—secondary reporting of the verified public-evaluation leaderboard (lower evidence tier). ARC-AGI-3: &lt;1%—ARC Prize Foundation (2026b); 62.7% Standard—ARC Prize Foundation (2026d).
+
+Comparability note. Figures are not directly comparable across dates, resource budgets, and harnesses. Human references: ARC-AGI-1's ≈85% is a historical threshold whose equivalence to measured human-average performance was later retracted by ARC Prize Foundation (2024); every ARC-AGI-3 environment was solved by at least two people (ARC Prize Foundation, 2026c). The 99.9% Provider Adapter result (ARC Prize Foundation, 2026e) is excluded from the Standard-harness column because it uses provider-specific context management.
+
+The table is not a controlled longitudinal experiment. The 24.03% ARC-AGI-2 result came from NVARC under the constrained 2025 competition (ARC Prize Foundation, 2026a), the 68.8% figure was the frontier snapshot in a living survey covering results through February 2026 (Vahdati et al., 2026), and later scores used different commercial systems and inference budgets. The sequence nevertheless reveals the central measurement problem. ARC-AGI-1 approached saturation, but a redesign that increased novelty and then interaction restored large performance gaps. High static competence did not transfer at the same level when the task required acquiring rules through action.
+
+ARC-AGI-3 makes the contrast especially visible. At its March 2026 launch, tested frontier systems scored below 1% (ARC Prize Foundation, 2026b). In human testing with 458 participants, every one of the 135 environments was solved by at least two people under first-run conditions (ARC Prize Foundation, 2026c). This is a coverage result, not a claim that every participant solved every task or achieved identical efficiency. By September, the vendor-reported result published by ARC Prize was 62.7% for GPT-6 Astra at maximum reasoning under its provider-neutral Standard harness (ARC Prize Foundation, 2026d). The improvement is substantial and should not be minimized. Yet the contemporaneous 99.9% result under a Provider Adapter—using provider-specific context management and opaque reasoning state—also shows that the harness, memory policy, and interaction protocol are part of the measured system (ARC Prize Foundation, 2026e).
+
+This does not prove a permanent human–machine divide. It demonstrates that a benchmark score is highly conditional on where novelty is placed and what support surrounds the model. Near-ceiling performance on ARC-AGI-1 did not entail near-ceiling performance on the initial ARC-AGI-3 protocol. Conversely, a strong provider-specific harness could nearly saturate the latter. The scientifically relevant object is not an isolated model name or score; it is a learning system embedded in a protocol, with declared priors, memory, tools, actions, and compute.
+
+### 3.2 Commonsense requires models of agents, not only answer patterns
+
+ARC tests a deliberately abstract kind of novelty. Commonsense extends the problem to agents, causes, and expectations. Shu et al.'s (2021) AGENT benchmark, released at ICML 2021 (IBM Research, 2021), contains 8,400 procedurally generated 3D animations organized around goal preferences, action efficiency, hidden constraints, and cost–reward trade-offs. A model observes familiarization episodes and judges whether behavior in a changed scene is expected or surprising.
+
+AGENT matters to the discrepancy thesis because success depends on more than associating an input form with an output label. The observer must infer a latent goal, represent physical constraints, and explain action as approximately rational under costs. The paper's Bayesian inverse-planning baseline explicitly encoded planning, object, and physical structure; comparisons with neural Theory-of-Mind approaches supported the value of structured priors for transfer. The benchmark does not capture all social cognition, and it predates current frontier multimodal systems. Still, it isolates a core fact: commonsense judgments often require an explanatory model of why an agent acted, not merely a plausible continuation of what was said.
+
+### 3.3 Commonsense is culturally situated as well as causal
+
+A system can pass an abstract social-reasoning test and still assume the wrong norms, institutions, or conversational expectations for a user's context. Naous et al. (2023) constructed CAMeL from 628 naturally occurring prompts and 20,368 entities spanning eight types that contrast Arab and Western cultural contexts. Across 16 multilingual and Arabic monolingual language models, the study reported Western-oriented bias, culturally inappropriate adaptation, and stereotyping in the evaluated Arabic tasks.
+
+The result is intentionally narrow. It does not establish a universal ranking of cultures or prove that all models fail all non-Western settings. It shows that fluent linguistic competence can coexist with systematically misplaced expectations. That coexistence is central to the benchmark–intelligence gap. Static language benchmarks reward knowledge and response regularity, while commonsense use requires recognizing which background assumptions apply here, to these people, under these norms.
+
+The evidence from ARC, AGENT, and CAMeL is heterogeneous, and it should remain so. ARC probes abstraction and interaction; AGENT probes intuitive psychology; CAMeL probes culturally situated language behavior. Their value is not that their scores can be averaged into a new intelligence number. Their value is that they expose distinct ways in which endpoint competence can fail to transfer when novelty, causality, agency, or context becomes central.
+
+## 4. The gap is an objective mismatch, not merely insufficient scale
+
+### 4.1 Plausible continuation is not the same target as causal adequacy
+
+A language model trained by next-token prediction is optimized to assign high probability to text continuations under its training distribution. This objective can produce rich representations, factual knowledge, planning-like behavior, and useful internal abstractions. Nothing in the objective proves that causal models cannot emerge. The stronger categorical claim—that transformers are incapable of world models—would exceed the evidence.
+
+The narrower structural claim is harder to dismiss: likelihood rewards predictive plausibility, whereas commonsense action requires a model that remains adequate under intervention. A sentence can be locally plausible while resting on a false assumption about the world. A plan can read coherently while failing because an object persists, a person holds a hidden belief, or an action irreversibly changes the state. Text prediction can learn many such regularities indirectly, but it does not directly require an agent to act, observe consequences, preserve state, and revise a causal hypothesis over a long horizon.
+
+LeCun's (2022) position paper makes this mismatch explicit by proposing an objective-driven architecture with perception, memory, a predictive world model, objectives, and an actor. Its joint-embedding approach aims to predict relevant latent structure rather than reconstruct every detail of raw observations. The proposal is a research program, not a demonstrated solution. Its importance here is conceptual: if intelligence requires selecting actions by their expected consequences, then an evaluation limited to answer production leaves the central causal loop untested.
+
+### 4.2 Scaling can enlarge competence without resolving the measurement mismatch
+
+Scale has repeatedly delivered capabilities that earlier critiques underestimated. More data, parameters, and inference-time computation can improve reasoning accuracy and can elicit behaviors resembling hypothesis testing. Snell et al. (2024) showed that allocating test-time computation according to problem difficulty improved efficiency by more than fourfold relative to a best-of-N baseline; under a matched floating-point-operation budget, a smaller model sometimes outperformed a model 14 times larger. These are genuine advances.
+
+They do not remove the distinction between skill and skill acquisition. Search performs best when candidate generation covers the solution and a verifier can recognize it. Verifiable mathematics and code offer unusually strong feedback; ambiguous social and physical situations often do not. More samples can increase the chance of a correct answer without producing a stable causal representation, and repeated test-time adaptation changes the amount of experience consumed. The score must therefore be paired with the compute, interactions, feedback, and memory that generated it.
+
+Calling the gap "structural" should not be confused with declaring it permanent. The claim is about alignment between objectives and constructs. Training and evaluation reward high-probability outputs on sampled tasks; fluid intelligence concerns efficient reorganization under novel tasks; commonsense concerns grounded prediction and action. Scaling an imperfect proxy may improve the target indirectly, sometimes dramatically, while still leaving the proxy–target relationship uncertain. That is precisely the condition in which Goodhart effects matter.
+
+### 4.3 Structured and predictive systems address missing demands
+
+Neuro-symbolic research attempts to combine learned representations with explicit variables, programs, constraints, or logical operations. Garcez and Lamb (2020) present this integration as a route toward systems that learn from data while supporting compositional reasoning and inspectable structure. In an ARC task, a neural component might identify objects while a symbolic component composes transformations. In social reasoning, an explicit planner can relate goals, constraints, costs, and observed action.
+
+World models address a complementary demand: representing how an environment changes and what actions cause. In an unfamiliar interactive task, a useful system must distinguish observation from state, preserve what is no longer visible, predict consequences, and decide which experiment will reduce uncertainty. These are precisely the capacities that a static answer benchmark can avoid measuring.
+
+Neither direction guarantees commonsense. Symbols must be grounded; representations may be wrong; planners can exploit errors in learned dynamics; natural environments are partially observed and normatively ambiguous. The point is not that one architecture will replace language models. It is that systems explicitly designed for state, causality, memory, and search target demands that next-token likelihood and static benchmarks only capture indirectly. The discrepancy is therefore a research agenda: align training objectives and evaluations with adaptation, not merely with fluent completion.
+
+## 5. Honest measurement must test learning, not only answers
+
+If the target is fluid and commonsense intelligence, evaluation must measure the process by which competence emerges. A credible regime would preserve the reproducibility of benchmarks while refusing to treat a fixed score as self-interpreting.
+
+### 5.1 Measure learning curves under controlled novelty
+
+The basic unit should be a learning curve: performance as a function of task-specific experience and computation. Test families should vary their distance from public and training distributions, and should reserve private generative mechanisms rather than only private items. A system that reaches a threshold after two demonstrations is meaningfully different from one that reaches it after thousands of sampled attempts, even if both end at the same accuracy.
+
+Generalization difficulty should be explicit. Evaluators should distinguish familiar-domain interpolation, compositional recombination, transfer to new latent rules, and adaptation to a new environment. The resulting profile may be less convenient than one leaderboard number, but it is closer to the construct being claimed.
+
+### 5.2 Make interaction and revision observable
+
+Interactive evaluation should record actions, hypotheses, memory state, recoveries, and efficiency—not merely whether the terminal goal was reached. ARC-AGI-3 is a useful step because its environments require exploration and its scoring incorporates action efficiency relative to humans. Replays can reveal whether a system formed a transferable model, stumbled into success, perseverated on a false rule, or relied on an interface-specific memory mechanism.
+
+Sustained reasoning must also be evaluated across interruptions, delayed consequences, and misleading early evidence. Commonsense is not only the ability to produce an explanation after the fact. It is the ability to maintain a coherent model, notice when prediction fails, and revise the model without discarding what remains valid.
+
+### 5.3 Treat contamination resistance as a design property
+
+Decontamination cannot rely solely on post hoc searches for exact overlap. Evaluation designers should use newly generated tasks, hidden generators, time-bounded data, controlled paraphrases, and canary or watermark methods where appropriate. Public examples may teach an interface, but the latent rules used for scoring should remain fresh. Results should state what contamination checks were possible and what remained unknowable, especially for proprietary training corpora.
+
+A benchmark should also be rotated once community optimization has made its score a product requirement. Saturation is not failure; it is evidence that the instrument has lost discriminative power at the frontier. Replacing or regenerating the test is part of measurement, not an attempt to move the goalposts.
+
+### 5.4 Report the whole evaluated system
+
+Every intelligence claim should specify the model version, prompts, tools, verifier, memory policy, agent harness, number of attempts, interaction budget, inference cost, and dataset date. Standard and provider-adapted harnesses should be reported separately. Accuracy without resource accounting invites the false inference that the same competence would appear under ordinary use or under human-comparable experience.
+
+Finally, no single benchmark should stand in for commonsense. Physical prediction, intuitive psychology, cultural pragmatics, causal intervention, long-horizon planning, and uncertainty calibration are different constructs. A multidimensional profile is scientifically less theatrical than one score—and more honest.
+
+## 6. Conclusion
+
+The central discrepancy is not between "smart machines" and "stupid machines." It is between what a score directly establishes and what the language of intelligence implies. Contemporary systems possess broad, useful, and rapidly improving competence. Fixed benchmarks can measure that competence reliably within a protocol. They do not, by themselves, establish efficient adaptation to unfamiliar distributions, grounded commonsense, or sustained causal reasoning.
+
+ARC-AGI makes the discrepancy visible by moving the target from sparse static transformations toward harder composition and interactive discovery. The resulting changes in performance, together with the large effects of inference budgets and harness design, show that "the model's intelligence" is not a context-free scalar. AGENT adds the need to infer goals and constraints; CAMeL adds the need to locate behavior within a cultural context. Contamination research and Goodhart's law explain why public scores become weaker proxies as more optimization is directed at them.
+
+This paper's position is therefore straightforward: benchmark scores systematically overstate intelligence when skill demonstration is conflated with skill-acquisition efficiency. The overstatement is a property of interpretation, not proof that the measured competence is fake. Nor is it a proof that language models cannot acquire causal representations. It is a demand for tighter claims. Until benchmarks measure how systems learn under novelty—using controlled experience, interaction, transfer, and resource accounting—reported "intelligence" will continue to exceed the fluid and commonsense capacities actually demonstrated.
+
+## References
+
+- ARC Prize Foundation. (2024). Day 1 update. [https://ARCPrize.org/blog/day-1-update](https://ARCPrize.org/blog/day-1-update)
+- ARC Prize Foundation. (2026a). ARC Prize 2025 results and analysis. [https://arcprize.org/blog/arc-prize-2025-results-analysis](https://arcprize.org/blog/arc-prize-2025-results-analysis)
+- ARC Prize Foundation. (2026b, April 22). ARC-AGI-3: A new challenge for frontier agentic intelligence \[Technical report\]. [https://arcprize.org/media/ARC_AGI_3_Technical_Report.pdf](https://arcprize.org/media/ARC_AGI_3_Technical_Report.pdf)
+- ARC Prize Foundation. (2026c). Measuring human performance on ARC-AGI-3. [https://arcprize.org/blog/arc-agi-3-human-dataset](https://arcprize.org/blog/arc-agi-3-human-dataset)
+- ARC Prize Foundation. (2026d). OpenAI's GPT-6 Astra on ARC-AGI-3. [https://arcprize.org/blog/astra](https://arcprize.org/blog/astra)
+- ARC Prize Foundation. (2026e). GPT-6 Astra results. [https://arcprize.org/results/openai-gpt-6-astra](https://arcprize.org/results/openai-gpt-6-astra)
+- Cattell, R. B. (1963). Theory of fluid and crystallized intelligence: A critical experiment. Journal of Educational Psychology, 54(1), 1–22. [https://psycnet.apa.org/record/1963-07991-001](https://psycnet.apa.org/record/1963-07991-001)
+- Chollet, F. (2019). On the measure of intelligence. arXiv:1911.01547. [http://arxiv.org/abs/1911.01547](http://arxiv.org/abs/1911.01547)
+- Deng, C., Zhao, Y., Tang, X., Gerstein, M., & Cohan, A. (2023). Investigating data contamination in modern benchmarks for large language models. arXiv:2311.09783. [https://arxiv.org/abs/2311.09783v1](https://arxiv.org/abs/2311.09783v1)
+- Garcez, A. d'A., & Lamb, L. C. (2020). Neurosymbolic AI: The 3rd wave. arXiv:2012.05876. [https://arxiv.org/abs/2012.05876?context=cs.LG](https://arxiv.org/abs/2012.05876?context=cs.LG)
+- IBM Research. (2021). IBM, MIT and Harvard release DARPA "Common Sense AI" dataset at ICML 2021. [https://research.ibm.com/blog/icml-darpa-agent](https://research.ibm.com/blog/icml-darpa-agent)
+- LeCun, Y. (2022, June). A path towards autonomous machine intelligence \[Position paper\]. [https://openreview.net/forum?id=BZ5a1r-kVsf](https://openreview.net/forum?id=BZ5a1r-kVsf)
+- Manheim, D., & Garrabrant, S. (2018). Categorizing variants of Goodhart's law. arXiv:1803.04585. [https://arxiv.org/pdf/1803.04585v3](https://arxiv.org/pdf/1803.04585v3)
+- Naous, T., Ryan, M. J., Ritter, A., & Xu, W. (2023). Having beer after prayer? Measuring cultural bias in large language models. arXiv:2305.14456. [https://arxiv.org/abs/2305.14456](https://arxiv.org/abs/2305.14456)
+- Shu, T., Bhandwaldar, A., Gan, C., Smith, K. A., Liu, S., Gutfreund, D., Spelke, E., Tenenbaum, J. B., & Ullman, T. D. (2021). AGENT: A benchmark for core psychological reasoning. In Proceedings of the 38th International Conference on Machine Learning (PMLR 139). [https://arxiv.org/abs/2102.12321?context=cs.LG](https://arxiv.org/abs/2102.12321?context=cs.LG)
+- Snell, C., Lee, J., Xu, K., & Kumar, A. (2024). Scaling LLM test-time compute optimally can be more effective than scaling model parameters. arXiv:2408.03314. [https://arxiv.org/abs/2408.03314?context=cs.CL](https://arxiv.org/abs/2408.03314?context=cs.CL)
+- Vahdati, S., Aioanei, A., Suresh, H., & Lehmann, J. (2026). The ARC of progress towards AGI: A living survey of abstraction and reasoning. arXiv:2603.13372. [https://arxiv.org/html/2603.13372](https://arxiv.org/html/2603.13372)
+
+## Appendix A. Interpreting the reported ARC-AGI figures
+
+The ARC-AGI figures are dated snapshots produced under different constraints. The 24.03% ARC-AGI-2 result belongs to the constrained 2025 competition (ARC Prize Foundation, 2026a); 68.8% is the frontier value in a survey covering results through February 2026 (Vahdati et al., 2026); and the September 2026 values come from later commercial systems with different inference budgets. They should not be plotted as if they were one controlled learning curve.
+
+The approximately 85% ARC-AGI-1 figure is a historical reference and grand-prize threshold, not a measured average on the private evaluation set; ARC Prize later retracted the equivalence between that 85% target and measured human-average performance (ARC Prize Foundation, 2024). For ARC-AGI-3, "every environment was solved by humans" means that each of the 135 environments was completed by at least two of the 458 participants under first-run conditions; it does not mean that every participant solved every environment (ARC Prize Foundation, 2026c). The vendor-reported 62.7% GPT-6 Astra figure published by ARC Prize uses the provider-neutral Standard harness (ARC Prize Foundation, 2026d). The 99.9% Provider Adapter result uses provider-specific context management and is relevant to end-to-end system performance, but it answers a different comparison question (ARC Prize Foundation, 2026e).
