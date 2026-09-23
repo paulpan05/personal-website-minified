@@ -45,4 +45,6 @@ OpenNext. Canonical origin: `https://paulpan.net`
    (see `ArcAgiChart`). Every figure needs `<title>`/`<desc>`, a numbered
    `<figcaption>`, and must not overclaim the data (e.g. snapshots from
    different harnesses are not a learning curve — say so in the caption).
-4. Run `npm test`, screenshot-check desktop + 390px widths, commit + push.
+4. Add the slug to `tests/smoke.spec.ts` (both the 200s list and the
+   mobile-overflow list — new pages get no coverage otherwise), then run
+   `npm test`, screenshot-check desktop + 390px widths, commit + push.
