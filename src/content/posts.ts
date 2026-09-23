@@ -33,6 +33,17 @@ const POST_DEFS: PostDef[] = [
     readingMinutes: 23,
     load: () => import('./posts/benchmark-intelligence-gap.mdx'),
   },
+  {
+    slug: 'frontier-models-september-2026',
+    title:
+      'Frontier Language Models in September 2026: Truthfulness, Sycophancy, and Code Quality',
+    date: '2026-09-23',
+    description:
+      'Snapshot: September 22, 2026. Gemini 3.8 Flash, Claude Sonnet 5, Muse Spark 1.3, and DeepSeek V4 Pro 0813 measured against truthfulness, presuppositional integrity, sycophancy, and forensic code quality. No model earns trust.',
+    tags: ['AI evaluation', 'survey', 'LLMs', 'benchmarks'],
+    readingMinutes: 45,
+    load: () => import('./posts/frontier-models-september-2026.mdx'),
+  },
 ]
 
 function toMeta({ load: _load, ...meta }: PostDef): PostMeta {
