@@ -139,6 +139,19 @@
     margin-top: 2em;
     border-color: $blog-hr;
   }
+
+  .chart-figure {
+    margin: 2em 0 0;
+    max-width: 100%;
+
+    figcaption {
+      margin-top: 1em;
+      max-width: 70ch;
+      line-height: 1.7;
+      color: $blog-muted;
+      font-size: 1rem;
+    }
+  }
 }
 
 // Homepage Writing section (inside the light-on-dark .content wrapper).

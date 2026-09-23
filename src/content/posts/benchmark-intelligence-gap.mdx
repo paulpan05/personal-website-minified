@@ -1,3 +1,5 @@
+import ArcAgiChart from "@/components/ArcAgiChart/ArcAgiChart";
+
 *Longform essay. This position paper argues that AI benchmark scores systematically overstate intelligence when endpoint performance is treated as evidence of fluid or commonsense intelligence — and sketches what honest measurement would require instead.*
 
 ## Abstract
@@ -61,6 +63,11 @@ These versions should not be read as three rungs on one difficulty ladder. They 
 | ARC-AGI-3 | Interactive discovery | &lt;1% at launch; 62.7% Standard (Sept.) | Novelty and harness change the result |
 
 Sources by row. ARC-AGI-1: 93.0%—Vahdati et al. (2026); 97.5–98.5%—secondary reporting of the verified public-evaluation leaderboard (lower evidence tier). ARC-AGI-2: 24.03%—ARC Prize Foundation (2026a); 68.8%—Vahdati et al. (2026); up to 95.0%—secondary reporting of the verified public-evaluation leaderboard (lower evidence tier). ARC-AGI-3: &lt;1%—ARC Prize Foundation (2026b); 62.7% Standard—ARC Prize Foundation (2026d).
+
+<figure className="chart-figure">
+  <ArcAgiChart />
+  <figcaption>**Figure 1.** Frontier AI accuracy when each ARC-AGI generation was introduced: near-saturation on static grids, a restored gap under harder composition, and a reset under interactive discovery. These are dated snapshots under different harnesses and budgets, not one controlled learning curve — see the comparability note and Appendix A.</figcaption>
+</figure>
 
 Comparability note. Figures are not directly comparable across dates, resource budgets, and harnesses. Human references: ARC-AGI-1's ≈85% is a historical threshold whose equivalence to measured human-average performance was later retracted by ARC Prize Foundation (2024); every ARC-AGI-3 environment was solved by at least two people (ARC Prize Foundation, 2026c). The 99.9% Provider Adapter result (ARC Prize Foundation, 2026e) is excluded from the Standard-harness column because it uses provider-specific context management.
 
