@@ -32,5 +32,22 @@ b {
 }
 
 a {
-  color: pink;
+  color: #ffc6d5;
+}
+
+.header a,
+.experience a {
+  color: #8a0038;
+}
+
+a:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+.header-subtitle {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  max-width: 700px;
 }

@@ -19,7 +19,7 @@ export const experienceCards: ExperienceCard[] = [
   {
     logo: "/image/Meta_Platforms_Inc._logo.svg",
     company: "Meta",
-    employmentTime: "Aug 2022 - now",
+    employmentTime: "Aug 2022 – Present",
     role: "Software Engineer",
     description: "Currently working on the Meta View App. Previously on device updates and frameworks.",
     programmingLanguages: "Kotlin, Java, Hack, Swift, Objective-C, C++",
@@ -28,7 +28,7 @@ export const experienceCards: ExperienceCard[] = [
   {
     logo: "/image/Amazon_Web_Services_Logo.svg",
     company: "Amazon Web Services",
-    employmentTime: "June 2021 - Sept 2021",
+    employmentTime: "June 2021 – Sept 2021",
     role: "Software Development Engineer Intern",
     description: "I worked on an internal tool which helps developers automatically be granted IAM permissions based on the types of data they are requesting / the team they are in. Throughout the internship, I learned how to provision server instances at various stages in the pipeline, along with how to develop server-side rendered webpages.",
     programmingLanguages: "Ruby, JavaScript",

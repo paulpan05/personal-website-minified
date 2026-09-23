@@ -2,16 +2,17 @@ import Image from 'next/image'
 
 export default function Header() {
   return (
-    <div className="header">
+    <header className="header">
       <Image
         src='/image/profile_picture.jpg'
         alt='Profile Picture'
         className="profile-image"
         width={250}
         height={250}
+        priority
       />
       <h1>Hi everyone! I&apos;m Paul.</h1>
-      <h3>Welcome to my homepage!</h3>
-    </div>
+      <p className="header-subtitle">Welcome to my homepage!</p>
+    </header>
   )
 }

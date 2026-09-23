@@ -8,12 +8,12 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="content">
+      <main className="content">
         <About />
         <Experience />
         <HighlightedProjects />
         <MoreAboutMe />
-      </div>
+      </main>
     </>
   )
 }
