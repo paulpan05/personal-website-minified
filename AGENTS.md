@@ -50,5 +50,7 @@ OpenNext. Canonical origin: `https://paulpan.net`
    `<figcaption>`, and must not overclaim the data (e.g. snapshots from
    different harnesses are not a learning curve — say so in the caption).
 4. Run `npm test` (post routes derive from POST_DEFS, so new posts are
-   covered automatically), screenshot-check desktop + 390px widths,
-   commit + push.
+   covered automatically), screenshot-check desktop + 390px widths using
+   Playwright's bundled chromium — never the system-Chrome `--screenshot`
+   CLI, which mis-scales viewports and produces false overflow alarms.
+   Commit + push.
