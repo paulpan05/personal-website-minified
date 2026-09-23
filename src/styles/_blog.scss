@@ -1,6 +1,6 @@
 @use 'tokens' as *;
 
-// Blog pages and homepage Writing section.
+// Blog pages.
 .blog {
   background-color: $blog-bg;
   color: $blog-ink;
@@ -151,15 +151,5 @@
       color: $blog-muted;
       font-size: 1rem;
     }
-  }
-}
-
-// Homepage Writing section (inside the light-on-dark .content wrapper).
-.writing-list {
-  list-style: none;
-  padding-left: 0;
-
-  > li {
-    margin-top: 1em;
   }
 }
