@@ -1,13 +1,12 @@
 import { expect, test } from "@playwright/test";
+import { getPostSlugs } from "../src/content/posts";
 
-const ROUTES = [
-	"/",
-	"/blog",
-	"/blog/benchmark-intelligence-gap",
-	"/blog/frontier-models-september-2026",
-	"/blog/rss.xml",
-	"/sitemap.xml",
-];
+// Post routes derive from the POST_DEFS registry, so new posts are covered
+// automatically. (The .mdx imports in posts.ts are lazy and never execute
+// here — only the slug list is used.)
+const POST_ROUTES = getPostSlugs().map((slug) => `/blog/${slug}`);
+
+const ROUTES = ["/", "/blog", ...POST_ROUTES, "/blog/rss.xml", "/sitemap.xml"];
 
 test("routes return 200", async ({ request, baseURL }) => {
 	for (const route of ROUTES) {
@@ -18,7 +17,7 @@ test("routes return 200", async ({ request, baseURL }) => {
 
 test("no horizontal overflow at mobile width", async ({ page }) => {
 	await page.setViewportSize({ width: 390, height: 844 });
-	for (const route of ["/", "/blog", "/blog/benchmark-intelligence-gap", "/blog/frontier-models-september-2026"]) {
+	for (const route of ["/", "/blog", ...POST_ROUTES]) {
 		await page.goto(route);
 		const overflow = await page.evaluate(
 			() => document.documentElement.scrollWidth - window.innerWidth,
