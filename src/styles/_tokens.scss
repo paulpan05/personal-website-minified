@@ -1,6 +1,17 @@
-// Site-wide color tokens. All palette values live here; components and
-// pages reference these instead of hardcoding hex values.
+// Site-wide design tokens. All palette and typeface values live here;
+// components and pages reference these instead of hardcoding values.
 
+// Display voice: terminal-native monospace for headings, nav, metadata,
+// and code. System stack, zero downloads.
+$font-display: ui-monospace, SFMono-Regular, Menlo, Consolas,
+  "Liberation Mono", monospace;
+
+// Body voice: neutral proportional sans for all prose. System stack,
+// zero downloads.
+$font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  "Helvetica Neue", Arial, sans-serif;
+
+// Palette.
 // Link colors (chosen for contrast: dark crimson on light pastels,
 // light pink on dark surfaces).
 $link-on-light: #8a0038;

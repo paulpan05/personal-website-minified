@@ -45,6 +45,7 @@
 
 .blog-meta,
 .blog-tags {
+  font-family: $font-display;
   color: $blog-muted;
   font-size: 1rem;
   padding-top: 0.5em;
@@ -122,7 +123,7 @@
   }
 
   code {
-    font-family: "Lucida Console", "Courier New", monospace;
+    font-family: $font-display;
   }
 
   :not(pre) > code {
