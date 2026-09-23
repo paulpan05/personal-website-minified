@@ -29,6 +29,8 @@ export default function BlogIndex() {
                   <time dateTime={post.date}>{formatPostDate(post.date)}</time>
                   {' · '}
                   {post.readingMinutes} min read
+                  {' · '}
+                  {post.provenance}
                 </p>
                 <p>{post.description}</p>
               </li>

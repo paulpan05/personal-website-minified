@@ -70,6 +70,8 @@ export default async function BlogPost({
               <time dateTime={post.date}>{formatPostDate(post.date)}</time>
               {' · '}
               {post.readingMinutes} min read
+              {' · '}
+              {post.provenance}
             </p>
             {post.tags.length > 0 && (
               <p className="blog-tags">{post.tags.join(' · ')}</p>

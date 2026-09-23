@@ -34,6 +34,10 @@ OpenNext. Canonical origin: `https://paulpan.net`
   `$font-body` (system sans) for prose.
 - No snapshot/image tests. Smoke tests only (`tests/smoke.spec.ts`).
 - Keep `/test-results` and `/playwright-report` out of git (ignored).
+- Provenance: every post carries exactly one `provenance` value —
+  `AI-assisted` (AI-drafted under the author's direction; needs a process
+  note in the post) or `human-written` (the author's own prose).
+  Never mix, never omit.
 
 ## Publishing a post
 

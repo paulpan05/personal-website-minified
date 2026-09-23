@@ -11,6 +11,9 @@ export interface PostMeta {
   description: string
   tags: string[]
   readingMinutes: number
+  /** 'AI-assisted': AI-drafted under the author's direction (needs a process
+   *  note in the post). 'human-written': the author's own prose. */
+  provenance: 'AI-assisted' | 'human-written'
 }
 
 interface PostDef extends PostMeta {
@@ -30,6 +33,7 @@ const POST_DEFS: PostDef[] = [
     description:
       'Benchmark scores measure displayed skill on fixed tasks, not efficient learning under novelty. A position paper on ARC-AGI, commonsense evaluation, and what honest measurement would require.',
     tags: ['AI evaluation', 'position paper', 'ARC-AGI', 'commonsense reasoning'],
+    provenance: 'AI-assisted',
     readingMinutes: 23,
     load: () => import('./posts/benchmark-intelligence-gap.mdx'),
   },
@@ -41,6 +45,7 @@ const POST_DEFS: PostDef[] = [
     description:
       'Snapshot: September 22, 2026. Gemini 3.8 Flash, Claude Sonnet 5, Muse Spark 1.3, and DeepSeek V4 Pro 0813 measured against truthfulness, presuppositional integrity, sycophancy, and forensic code quality. No model earns trust.',
     tags: ['AI evaluation', 'survey', 'LLMs', 'benchmarks'],
+    provenance: 'AI-assisted',
     readingMinutes: 45,
     load: () => import('./posts/frontier-models-september-2026.mdx'),
   },
