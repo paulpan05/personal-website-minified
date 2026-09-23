@@ -76,6 +76,10 @@
     line-height: 1.7;
   }
 
+  a {
+    overflow-wrap: anywhere;
+  }
+
   ul,
   ol {
     padding-left: 1.5em;
