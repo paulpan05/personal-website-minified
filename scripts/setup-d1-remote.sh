@@ -20,14 +20,20 @@ DB_NAME="personal-website-search"
 PLACEHOLDER_ID="00000000-0000-0000-0000-000000000000"
 
 echo "→ Ensuring D1 database '$DB_NAME' exists..."
-CREATE_OUT=$(npx wrangler d1 create "$DB_NAME" 2>&1 || true)
-echo "$CREATE_OUT" | tail -5
-DB_ID=$(echo "$CREATE_OUT" | grep -oE 'database_id = "[0-9a-f-]+"' | head -1 | cut -d'"' -f2 || true)
+echo "(If wrangler offers to update wrangler.jsonc itself, answer no — this script patches it.)"
+# NOTE: no command substitution here — wrangler needs the live terminal for
+# its prompts. Output goes to a log file for id parsing instead.
+CREATE_LOG="$(mktemp)"
+npx wrangler d1 create "$DB_NAME" 2>&1 | tee "$CREATE_LOG" || true
+DB_ID=$(grep -oE 'database_id = "[0-9a-f-]+"' "$CREATE_LOG" | head -1 | cut -d'"' -f2 || true)
 
 if [ -z "${DB_ID:-}" ]; then
-  echo "→ Database already exists; looking up its id..."
-  DB_ID=$(npx wrangler d1 info "$DB_NAME" 2>/dev/null | grep -oE '[0-9a-f-]{36}' | head -1 || true)
+  echo "→ No id in create output; checking whether it already exists..."
+  # Parse `wrangler d1 list` (avoids `d1 info`, which resolves the name
+  # through the placeholder id currently in wrangler.jsonc).
+  DB_ID=$(npx wrangler d1 list 2>/dev/null | awk -v name="$DB_NAME" '$1 == name { print $2 }' | head -1 || true)
 fi
+rm -f "$CREATE_LOG"
 if [ -z "${DB_ID:-}" ]; then
   echo "ERROR: could not determine database_id. Run 'npx wrangler d1 info $DB_NAME' manually."
   exit 1
