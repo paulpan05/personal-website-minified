@@ -38,8 +38,9 @@ OpenNext. Canonical origin: `https://paulpan.net`
   band on scroll (an IntersectionObserver callback only reports changed
   entries — don't use it to pick a winner), with a bottom-of-page pin for
   the last section. Homepage sections carry anchor ids (`#about`,
-  `#experience`, `#projects`, `#contact`) that the nav targets; nav labels
-  match destination headings. Below 640px the nav is combo: goal links
+  `#experience`, `#projects`) that the nav targets; the Contact entry
+  targets `#contact`, the contact block inside the footer (site-wide, every
+  page). Nav labels match destination headings. Below 640px the nav is combo: goal links
   (Writing, More About Me) stay exposed, the rest collapse under a labeled
   Menu toggle with a chevron (44px rows, closes on tap/Escape/navigation,
   toggle pinned top-right via flex order). The footer repeats the section

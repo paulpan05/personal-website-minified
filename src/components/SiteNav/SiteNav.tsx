@@ -15,13 +15,14 @@ interface NavEntry {
 }
 
 // Display order mirrors the homepage top-to-bottom, with Writing slotted
-// where a reader would look for it. Labels match destination headings.
+// where a reader would look for it. Contact targets the footer contact
+// block, which lives on every page.
 const NAV_LINKS: NavEntry[] = [
   { label: 'About', href: '/#about', hash: '#about' },
   { label: 'Experience', href: '/#experience', hash: '#experience' },
   { label: 'Projects', href: '/#projects', hash: '#projects' },
   { label: 'Writing', href: '/blog', pinned: true, isPage: true },
-  { label: 'More About Me', href: '/#contact', hash: '#contact', pinned: true },
+  { label: 'Contact', href: '/#contact', hash: '#contact', pinned: true },
 ]
 
 // Active-section band, as fractions of viewport height (below the sticky
