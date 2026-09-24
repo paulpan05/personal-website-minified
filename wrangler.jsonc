@@ -18,7 +18,7 @@
 			// Placeholder until `wrangler d1 create personal-website-search`
 			// is run (requires Cloudflare login); then paste the real id.
 			// Local development (`--local`) resolves by database_name.
-			"database_id": "00000000-0000-0000-0000-000000000000",
+			"database_id": "5c4ceb28-03a9-4796-8099-a0904b58918c",
 			"migrations_dir": "migrations"
 		}
 	],
