@@ -11,6 +11,17 @@
 		"binding": "ASSETS",
 		"directory": ".open-next/assets"
 	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "personal-website-search",
+			// Placeholder until `wrangler d1 create personal-website-search`
+			// is run (requires Cloudflare login); then paste the real id.
+			// Local development (`--local`) resolves by database_name.
+			"database_id": "00000000-0000-0000-0000-000000000000",
+			"migrations_dir": "migrations"
+		}
+	],
 	"images": {
 		"binding": "IMAGES"
 	},

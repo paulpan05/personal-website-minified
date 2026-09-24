@@ -15,6 +15,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { toPlainText } from './mdx-text.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const postsDir = join(root, 'src', 'content', 'posts')
@@ -27,29 +28,6 @@ const STOPWORDS = new Set(
 )
 
 /** Strip MDX/markdown syntax, keeping the human-readable words. */
-function toPlainText(mdx) {
-  return (
-    mdx
-      // fenced code blocks: drop fences, keep code text (searchable)
-      .replace(/```[\s\S]*?```/g, (block) =>
-        block.replace(/```\w*\n?/g, ' '),
-      )
-      // MDX/JSX imports carry no prose
-      .replace(/^import .*$/gm, ' ')
-      // figcaptions carry real prose: keep inner text, drop the tags
-      .replace(/<figcaption>([\s\S]*?)<\/figcaption>/gi, ' $1 ')
-      // remaining JSX/HTML tags
-      .replace(/<\/?[A-Za-z][^>]*>/g, ' ')
-      // images: keep alt text; links: keep label text
-      .replace(/!\[([^\]]*)\]\([^)]*\)/g, ' $1 ')
-      .replace(/\[([^\]]*)\]\([^)]*\)/g, ' $1 ')
-      // markdown table pipes, heading hashes, quotes, rules, emphasis
-      .replace(/[|#>]/g, ' ')
-      .replace(/(\*\*|__|\*|_|~~|`)/g, ' ')
-      .replace(/-{3,}/g, ' ')
-      .replace(/\s+/g, ' ')
-  )
-}
 
 function tokenize(text) {
   const counts = new Map()

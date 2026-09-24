@@ -53,7 +53,31 @@ OpenNext. Canonical origin: `https://paulpan.net`
   note in the post) or `human-written` (the author's own prose).
   Never mix, never omit.
 
-## Publishing a post
+## Search at scale (D1 FTS5 + static fallback)
+
+- Source of truth stays the MDX files. D1 holds slug → body text ONLY
+  (titles/tags/descriptions stay in `POST_DEFS`); `/api/search` returns
+  slugs and the client joins metadata locally.
+- Schema: `migrations/0001_search.sql` (posts + porter-stemmed FTS5 +
+  sync triggers). Regenerate the seed after adding essays:
+  `node scripts/seed-search-db.mjs > d1/seed.sql`.
+- Local: `npx wrangler d1 execute DB --local --file=migrations/0001_search.sql`
+  once, then `--file=d1/seed.sql` after each batch of posts. Verify under
+  the real Worker (`npm run preview`, :8787 — `next start` has no D1).
+- Remote (needs `wrangler login` + real `database_id` in wrangler.jsonc):
+  `wrangler d1 create personal-website-search`,
+  `wrangler d1 migrations apply DB --remote`,
+  `wrangler d1 execute DB --remote --file=d1/seed.sql`.
+- Proving prod reads D1 (the fallback is silent by design):
+  `SEARCH_API_URL=https://paulpan.net npx playwright test tests/search-d1.spec.ts`.
+  It asserts `source: "d1-fts5"` plus known query→slug mappings. If it
+  fails but smoke passes, prod is on the static fallback — check
+  migrations/seeding. `npm test` covers the fallback contract (503 +
+  fallback:true) and skips the D1 suite without `SEARCH_API_URL`.
+- Index page: 20 essays per page (`?page=N`), year subheads per page,
+  tag chips + search box (title ×10 / tag ×5 / body-count scoring, all
+  query tokens must match). RSS capped at the 20 latest. Smoke tests
+  enumerate all routes up to 25 posts, then sample deterministically.
 
 1. Add `src/content/posts/<slug>.mdx` (no frontmatter — metadata lives in
    `POST_DEFS` in `src/content/posts.ts`).
@@ -72,7 +96,14 @@ OpenNext. Canonical origin: `https://paulpan.net`
 5. The index page groups posts by year (server-rendered, SEO + no-JS safe)
    with a client search box (full-text over the index, title ×10 / tag ×5 /
    body-count scoring, all query tokens must match) and tag filter chips.
-6. Run `npm test` (post routes derive from POST_DEFS, so new posts are
+6. Search is two-tier: `/api/search` queries D1 FTS5 (porter stemming,
+   bm25) when the Worker has the DB binding; otherwise it answers 503 +
+   `fallback:true` and the client uses the bundled static index. Success
+   responses carry `source: 'd1-fts5'` — curl prod to prove which tier
+   answers. `next start` has no D1, so `npm test` exercises the fallback
+   path by design; the D1 path is covered by `tests/search-d1.spec.ts`,
+   gated on SEARCH_API_URL (skipped without it).
+7. Run `npm test` (post routes derive from POST_DEFS, so new posts are
    covered automatically), screenshot-check desktop + 390px widths using
    Playwright's bundled chromium — never the system-Chrome `--screenshot`
    CLI, which mis-scales viewports and produces false overflow alarms.

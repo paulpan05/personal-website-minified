@@ -11,7 +11,9 @@ function escapeXml(value: string): string {
 }
 
 export async function GET(): Promise<Response> {
-  const posts = getAllPosts()
+  // RSS is a latest-posts feed, not an archive: cap at 20 so it stays
+  // feed-reader sized as the archive grows toward hundreds of essays.
+  const posts = getAllPosts().slice(0, 20)
   const items = posts
     .map(
       (post) => `    <item>

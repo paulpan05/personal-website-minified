@@ -125,6 +125,19 @@
   margin-top: 1.5em;
 }
 
+// Archive pagination (20 essays per page once the collection grows).
+.blog-pages {
+  display: flex;
+  gap: 1.5em;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-top: 2.5em;
+  padding-top: 1.5em;
+  border-top: 1px solid $blog-table-border;
+  font-family: $font-display;
+  color: $blog-muted;
+}
+
 .blog-meta,
 .blog-tags {
   font-family: $font-display;

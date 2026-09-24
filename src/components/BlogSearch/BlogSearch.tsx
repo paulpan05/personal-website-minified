@@ -73,6 +73,9 @@ export default function BlogSearch({
   const [query, setQuery] = useState('')
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const [index, setIndex] = useState<SearchIndex | null>(null)
+  // Slugs ranked by the D1 FTS5 API (bm25). Null until the API answers;
+  // a failed API falls back to the bundled static index below.
+  const [apiSlugs, setApiSlugs] = useState<string[] | null>(null)
   const indexPromise = useRef<Promise<SearchIndex> | null>(null)
 
   const tags = useMemo(
@@ -84,8 +87,8 @@ export default function BlogSearch({
 
   // Lazy-load the full-text index on first search keystroke — never part
   // of the initial bundle. Tag-only filtering needs no index at all.
-  useEffect(() => {
-    if (queryTokens.length === 0 || index || indexPromise.current) {
+  const loadStaticIndex = () => {
+    if (index || indexPromise.current) {
       return
     }
     indexPromise.current = import('@/content/search-index.json').then(
@@ -95,7 +98,47 @@ export default function BlogSearch({
         return loaded
       },
     )
-  }, [queryTokens.length, index])
+  }
+
+  // Prefer the D1 FTS5 API (porter stemming, bm25); fall back to the
+  // bundled static index when the API has no database (local `next start`,
+  // unmigrated environments). Debounced per keystroke.
+  useEffect(() => {
+    setApiSlugs(null)
+    if (queryTokens.length === 0) {
+      return
+    }
+    const trimmed = query.trim()
+    let cancelled = false
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 2500)
+    const timer = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(trimmed)}`, {
+        signal: controller.signal,
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error('search API unavailable')
+          }
+          const data = (await res.json()) as { slugs: string[] }
+          if (!cancelled) {
+            setApiSlugs(data.slugs)
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            loadStaticIndex()
+          }
+        })
+    }, 200)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+      clearTimeout(timeout)
+      controller.abort()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
 
   const results = useMemo<RankedPost[] | null>(() => {
     if (!filtering) {
@@ -107,13 +150,35 @@ export default function BlogSearch({
     if (queryTokens.length === 0) {
       return candidates.map((post) => ({ post, score: 0 }))
     }
+    if (apiSlugs !== null) {
+      // D1 answered: keep bm25 order, apply the tag filter client-side,
+      // re-boost title/tag hits so metadata still outranks body mentions.
+      const order = new Map(apiSlugs.map((slug, i) => [slug, i]))
+      const matched = candidates.filter((post) => order.has(post.slug))
+      const titleBoost = (post: PostMeta) => {
+        const titleWords = new Set(wordTokens(post.title))
+        const tagWords = new Set(post.tags.flatMap(wordTokens))
+        return queryTokens.reduce(
+          (sum, token) =>
+            sum + (titleWords.has(token) ? 10 : 0) + (tagWords.has(token) ? 5 : 0),
+          0,
+        )
+      }
+      matched.sort(
+        (a, b) =>
+          order.get(a.slug)! - order.get(b.slug)! ||
+          titleBoost(b) - titleBoost(a),
+      )
+      return matched.map((post) => ({ post, score: 0 }))
+    }
     if (!index) {
       return null
     }
     return rankPosts(candidates, queryTokens, new Set(index.stopwords), index)
-  }, [filtering, activeTag, posts, queryTokens, index])
+  }, [filtering, activeTag, posts, queryTokens, apiSlugs, index])
 
-  const loadingText = queryTokens.length > 0 && !index
+  const loadingText =
+    queryTokens.length > 0 && apiSlugs === null && index === null
 
   return (
     <div className="blog-search">
