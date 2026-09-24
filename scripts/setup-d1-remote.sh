@@ -19,6 +19,12 @@ cd "$(dirname "$0")/.."
 DB_NAME="personal-website-search"
 PLACEHOLDER_ID="00000000-0000-0000-0000-000000000000"
 
+echo "→ Checking Cloudflare auth..."
+if ! npx wrangler whoami >/dev/null 2>&1; then
+  echo "→ Not logged in; launching interactive login..."
+  npx wrangler login
+fi
+
 echo "→ Ensuring D1 database '$DB_NAME' exists..."
 echo "(If wrangler offers to update wrangler.jsonc itself, answer no — this script patches it.)"
 # NOTE: no command substitution here — wrangler needs the live terminal for
@@ -64,7 +70,23 @@ echo "→ Verifying..."
 npx wrangler d1 execute DB --remote --command="SELECT count(*) AS posts FROM posts; SELECT count(*) AS fts_rows FROM posts_fts;"
 
 echo ""
-echo "Done. Ship it:"
-echo "  git add -A && git commit -m \"Wire remote D1 search database\" && git push"
+# Only the files this script owns are ever committed — never `git add -A`,
+# which would sweep unrelated local work into the commit. Default is no.
+if git diff --quiet -- wrangler.jsonc d1/seed.sql 2>/dev/null; then
+  echo "No changes to ship (wrangler.jsonc and d1/seed.sql already match)."
+else
+  echo "Changed files:"
+  git status --short -- wrangler.jsonc d1/seed.sql
+  printf "Commit and push these two files? [y/N] "
+  read -r answer </dev/tty || answer="n"
+  if [[ "$answer" == [yY] ]]; then
+    git add wrangler.jsonc d1/seed.sql
+    git commit -m "Wire remote D1 search database"
+    git push
+  else
+    echo "Skipped. Ship later with:"
+    echo "  git add wrangler.jsonc d1/seed.sql && git commit -m \"Wire remote D1 search database\" && git push"
+  fi
+fi
 echo "Then prove prod reads D1:"
 echo "  SEARCH_API_URL=https://paulpan.net npx playwright test tests/search-d1.spec.ts"
