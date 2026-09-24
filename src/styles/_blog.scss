@@ -46,6 +46,14 @@
     font-size: 1.5rem;
     line-height: 1.3;
   }
+
+  // Titles are the entry points: colored and underlined for maximum
+  // perceived affordance of clickability.
+  h2 a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
 }
 
 .blog-meta,

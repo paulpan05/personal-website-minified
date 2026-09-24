@@ -129,24 +129,43 @@
 }
 
 @media (max-width: 640px) {
+  // Closed bar: wordmark + pinned links + Menu toggle in rows; when open,
+  // the toggle stays top-right and the panel drops below everything.
+  .site-nav .site-wordmark {
+    order: 1;
+  }
+
   .site-nav .nav-toggle {
     display: block;
+    order: 2;
+    margin-left: auto;
   }
 
   .site-nav .site-links {
+    order: 3;
+  }
+
+  // Combo nav: pinned goal links (Writing, More About Me) stay exposed;
+  // the rest collapse under Menu until opened.
+  .site-nav .site-links:not(.open) a.collapsible {
     display: none;
+  }
+
+  .site-nav .site-links {
+    gap: 1em;
+  }
+
+  .site-nav .site-links.open {
+    display: flex;
     flex-basis: 100%;
     flex-direction: column;
     align-items: stretch;
     gap: 0;
   }
 
-  .site-nav .site-links.open {
-    display: flex;
-  }
-
-  .site-nav .site-links a {
+  .site-nav .site-links.open a {
     // Full-width 44px+ rows while the menu is open.
+    display: block;
     padding: 0.75em 0.25em;
     border-top: 1px solid $blog-hr;
   }
@@ -154,6 +173,23 @@
 
 .site-footer {
   border-top: 2px solid $blog-hr;
+}
+
+// Back-to-top control for long pages (homepage, essays).
+.back-to-top {
+  position: fixed;
+  right: 1.25em;
+  bottom: 1.25em;
+  z-index: 50;
+  font-family: $font-display;
+  color: $blog-ink;
+  background-color: $blog-bg;
+  border: 2px solid $blog-hr;
+  border-radius: 0.375em;
+  padding: 0.5em 0.75em;
+  min-height: 44px;
+  min-width: 44px;
+  cursor: pointer;
 }
 
 // About Component

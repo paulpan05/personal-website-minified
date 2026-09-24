@@ -32,15 +32,18 @@ OpenNext. Canonical origin: `https://paulpan.net`
   hardcode palette/typeface values.
 - Type voices: `$font-display` (monospace) for headings/nav/meta/code,
   `$font-body` (system sans) for prose.
-- Site chrome (`SiteNav`, `SiteFooter`) renders once in `src/app/layout.tsx`,
-  not per page. `SiteNav` is a client component: active state is recomputed
-  from every section's overlap with the viewport band on scroll (an
-  IntersectionObserver callback only reports changed entries — don't use it
-  to pick a winner), with a bottom-of-page pin for the last section.
-  Homepage sections carry anchor ids (`#about`, `#experience`,
-  `#projects`, `#contact`) that the nav targets. Below 640px the links
-  collapse into a Menu toggle (44px rows, closes on tap/Escape/navigation);
-  keep footer `.site-links` rules out of nav-only selectors.
+- Site chrome (`SiteNav`, `SiteFooter`, `BackToTop`) renders once in
+  `src/app/layout.tsx`, not per page. `SiteNav` is a client component:
+  active state is recomputed from every section's overlap with the viewport
+  band on scroll (an IntersectionObserver callback only reports changed
+  entries — don't use it to pick a winner), with a bottom-of-page pin for
+  the last section. Homepage sections carry anchor ids (`#about`,
+  `#experience`, `#projects`, `#contact`) that the nav targets; nav labels
+  match destination headings. Below 640px the nav is combo: goal links
+  (Writing, More About Me) stay exposed, the rest collapse under a labeled
+  Menu toggle with a chevron (44px rows, closes on tap/Escape/navigation,
+  toggle pinned top-right via flex order). The footer repeats the section
+  links. Keep footer `.site-links` rules out of nav-only selectors.
 - Post footer navigation uses `getAdjacentPosts()` from the registry.
 - No snapshot/image tests. Smoke tests only (`tests/smoke.spec.ts`).
 - Keep `/test-results` and `/playwright-report` out of git (ignored).

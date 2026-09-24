@@ -7,16 +7,21 @@ import { useCallback, useEffect, useState } from 'react'
 interface NavEntry {
   label: string
   href: string
-  hash: string
+  hash?: string
+  /** Stays exposed on mobile; unpinned links collapse under Menu. */
+  pinned?: boolean
+  /** Full-page route (vs homepage anchor). */
+  isPage?: boolean
 }
 
-// Homepage order: About, Experience, Projects, Writing (separate page),
-// Contact (last section on the homepage).
-const SECTION_LINKS: NavEntry[] = [
+// Display order mirrors the homepage top-to-bottom, with Writing slotted
+// where a reader would look for it. Labels match destination headings.
+const NAV_LINKS: NavEntry[] = [
   { label: 'About', href: '/#about', hash: '#about' },
   { label: 'Experience', href: '/#experience', hash: '#experience' },
   { label: 'Projects', href: '/#projects', hash: '#projects' },
-  { label: 'Contact', href: '/#contact', hash: '#contact' },
+  { label: 'Writing', href: '/blog', pinned: true, isPage: true },
+  { label: 'More About Me', href: '/#contact', hash: '#contact', pinned: true },
 ]
 
 // Active-section band, as fractions of viewport height (below the sticky
@@ -60,7 +65,10 @@ export default function SiteNav() {
     const bandBottom = window.innerHeight * BAND_BOTTOM_FRACTION
     let best = ''
     let bestOverlap = 0
-    for (const link of SECTION_LINKS) {
+    for (const link of NAV_LINKS) {
+      if (!link.hash) {
+        continue
+      }
       const el = document.querySelector(link.href.slice(1))
       if (!el) {
         continue
@@ -105,8 +113,27 @@ export default function SiteNav() {
   const writingActive =
     pathname === '/blog' || pathname.startsWith('/blog/')
   const homeActive = onHome && activeHash === ''
-  const isSectionLink = (link: NavEntry) =>
-    onHome && activeHash === link.hash
+
+  const renderLink = (link: NavEntry) => {
+    const active = link.isPage
+      ? writingActive
+      : onHome && activeHash === link.hash
+    return (
+      <Link
+        key={link.href}
+        href={link.href}
+        aria-current={active ? 'page' : undefined}
+        className={[
+          active ? 'active' : '',
+          link.pinned ? '' : 'collapsible',
+        ]
+          .join(' ')
+          .trim() || undefined}
+      >
+        {link.label}
+      </Link>
+    )
+  }
 
   return (
     <nav
@@ -125,15 +152,6 @@ export default function SiteNav() {
       >
         ~/paulpan
       </Link>
-      <button
-        type="button"
-        className="nav-toggle"
-        aria-expanded={menuOpen}
-        aria-controls="site-nav-menu"
-        onClick={() => setMenuOpen((open) => !open)}
-      >
-        Menu
-      </button>
       <span
         id="site-nav-menu"
         className={`site-links${menuOpen ? ' open' : ''}`}
@@ -141,34 +159,17 @@ export default function SiteNav() {
         // hashchange — so close the menu on any link tap directly.
         onClick={() => setMenuOpen(false)}
       >
-        {SECTION_LINKS.slice(0, 3).map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            aria-current={isSectionLink(link) ? 'page' : undefined}
-            className={isSectionLink(link) ? 'active' : undefined}
-          >
-            {link.label}
-          </Link>
-        ))}
-        <Link
-          href="/blog"
-          aria-current={writingActive ? 'page' : undefined}
-          className={writingActive ? 'active' : undefined}
-        >
-          Writing
-        </Link>
-        {SECTION_LINKS.slice(3).map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            aria-current={isSectionLink(link) ? 'page' : undefined}
-            className={isSectionLink(link) ? 'active' : undefined}
-          >
-            {link.label}
-          </Link>
-        ))}
+        {NAV_LINKS.map(renderLink)}
       </span>
+      <button
+        type="button"
+        className="nav-toggle"
+        aria-expanded={menuOpen}
+        aria-controls="site-nav-menu"
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        Menu <span aria-hidden="true">▾</span>
+      </button>
     </nav>
   )
 }

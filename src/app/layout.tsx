@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { SITE_URL } from '@/lib/site'
 import SiteNav from '@/components/SiteNav/SiteNav'
 import SiteFooter from '@/components/SiteFooter/SiteFooter'
+import BackToTop from '@/components/BackToTop/BackToTop'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -49,6 +50,7 @@ export default function RootLayout({
         <SiteNav />
         {children}
         <SiteFooter />
+        <BackToTop />
       </body>
     </html>
   )
