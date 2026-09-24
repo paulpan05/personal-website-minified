@@ -53,30 +53,44 @@ OpenNext. Canonical origin: `https://paulpan.net`
   note in the post) or `human-written` (the author's own prose).
   Never mix, never omit.
 
-## Search at scale (D1 FTS5 + static fallback)
+## Search at scale (D1 is the only query tier)
 
-- Source of truth stays the MDX files. D1 holds slug → body text ONLY
-  (titles/tags/descriptions stay in `POST_DEFS`); `/api/search` returns
-  slugs and the client joins metadata locally.
+- Source of truth: MDX files + `POST_DEFS`. D1 is derived via
+  `scripts/seed-search-db.mjs` (imports the registry through Node type
+  stripping — no regex parsing) and holds the full row: slug, title,
+  published_at, description, tags, reading_minutes, provenance, body.
+  Regeneration is whole-table INSERT OR REPLACE, so code and database
+  cannot diverge. There is no static index and no silent fallback.
 - Schema: `migrations/0001_search.sql` (posts + porter-stemmed FTS5 +
-  sync triggers). `cloudflare-env.d.ts` is force-tracked (generated, but
+  sync triggers), `migrations/0002_metadata.sql` (metadata columns).
+  `cloudflare-env.d.ts` is force-tracked (generated, but
   fresh clones need it for `D1Database` types) — regenerate with
   `npm run cf-typegen` whenever bindings change and commit the result.
   Regenerate the seed after adding essays:
   `node scripts/seed-search-db.mjs > d1/seed.sql`.
+- Reads: `/api/search` (FTS5 bm25, full metadata rows, optional `tag`),
+  `/api/posts` (paginated metadata, optional `tag`), `/api/tags`
+  (distinct topics). The client never holds more than one page; the
+  server-rendered first page stays the SEO/no-JS baseline. FTS5 MATCH
+  requires the table name, never an alias; D1 bind placeholders must stay
+  densely numbered; route files may only export route handlers.
+- Without a database the APIs answer 503 + explicit `error` and the UI
+  reports unavailability — never shadow results. (`next start` may or
+  may not resolve the platform proxy at request time; the smoke shape
+  test accepts both tiers. Real D1 behavior is pinned by
+  `tests/search-d1.spec.ts` under preview/prod.)
 - Local: `npx wrangler d1 execute DB --local --file=migrations/0001_search.sql`
-  once, then `--file=d1/seed.sql` after each batch of posts. Verify under
-  the real Worker (`npm run preview`, :8787 — `next start` has no D1).
-- Remote (needs `wrangler login` + real `database_id` in wrangler.jsonc):
-  `wrangler d1 create personal-website-search`,
-  `wrangler d1 migrations apply DB --remote`,
+  once (plus 0002), then `--file=d1/seed.sql` after each batch of posts.
+  Verify under the real Worker (`npm run preview`, :8787).
+- Remote (needs `wrangler login` + real `database_id` in wrangler.jsonc,
+  or just `npm run setup:d1`): `wrangler d1 create
+  personal-website-search`, `wrangler d1 migrations apply DB --remote`,
   `wrangler d1 execute DB --remote --file=d1/seed.sql`.
-- Proving prod reads D1 (the fallback is silent by design):
+- Proving prod reads D1:
   `SEARCH_API_URL=https://paulpan.net npx playwright test tests/search-d1.spec.ts`.
-  It asserts `source: "d1-fts5"` plus known query→slug mappings. If it
-  fails but smoke passes, prod is on the static fallback — check
-  migrations/seeding. `npm test` covers the fallback contract (503 +
-  fallback:true) and skips the D1 suite without `SEARCH_API_URL`.
+  It asserts `source: "d1-fts5"`/`"d1"` plus known query→slug mappings. If
+  it fails but smoke passes, prod has no database — check
+  migrations/seeding. Dashboard Workers + D1 analytics corroborate.
 - Index page: 20 essays per page (`?page=N`), year subheads per page,
   tag chips + search box (title ×10 / tag ×5 / body-count scoring, all
   query tokens must match). RSS capped at the 20 latest. Smoke tests
@@ -88,8 +102,9 @@ OpenNext. Canonical origin: `https://paulpan.net`
   diverse content ≈ 20 KB/post, so ~10 MB at 500 — D1 is already primary.
   Re-measure with `scripts/gen-fixture-posts.mjs <copy> <N>` before
   assuming headroom. Triggers for the next migration (dynamic post
-  rendering, R2 bodies): build approaching CI timeouts, or static index
-  exceeding ~2 MB.
+   rendering, R2 bodies): build approaching CI timeouts.
+
+## Publishing a post
 
 1. Add `src/content/posts/<slug>.mdx` (no frontmatter — metadata lives in
    `POST_DEFS` in `src/content/posts.ts`).
@@ -100,21 +115,15 @@ OpenNext. Canonical origin: `https://paulpan.net`
    (see `ArcAgiChart`). Every figure needs `<title>`/`<desc>`, a numbered
    `<figcaption>`, and must not overclaim the data (e.g. snapshots from
    different harnesses are not a learning curve — say so in the caption).
-4. The search index regenerates itself: `prebuild` runs
-   `scripts/build-search-index.mjs` before every `npm run build` (and
-   `npm test` builds first, so it is covered there too). Commit the
-   regenerated `src/content/search-index.json` with the post — never
-   hand-edit it. The index lazy-loads on first search keystroke; post
-   metadata for ranking comes from `POST_DEFS`, already in the bundle.
-5. The index page groups posts by year (server-rendered, SEO + no-JS safe)
-   with a client search box (full-text over the index, title ×10 / tag ×5 /
-   body-count scoring, all query tokens must match) and tag filter chips.
-6. Search is two-tier: `/api/search` queries D1 FTS5 (porter stemming,
-   bm25) when the Worker has the DB binding; otherwise it answers 503 +
-   `fallback:true` and the client uses the bundled static index. Success
-   responses carry `source: 'd1-fts5'` — curl prod to prove which tier
-   answers. `next start` has no D1, so `npm test` exercises the fallback
-   path by design; the D1 path is covered by `tests/search-d1.spec.ts`,
+4. Re-seed D1: `node scripts/seed-search-db.mjs > d1/seed.sql`, then
+   `--file=d1/seed.sql` against local (always) and remote (before the
+   deploy that must serve the new post). Listing, search, and tags read
+   D1 exclusively — an unseeded post is invisible to all three.
+5. The index page shows 20 essays per screen (`?page=N`) with year
+   subheads, tag chips, and a search box, all backed by the `/api/posts`,
+   `/api/tags`, and `/api/search` routes.
+6. `source: 'd1'` / `'d1-fts5'` in API responses proves the tier — curl
+   prod to check. The D1 path is covered by `tests/search-d1.spec.ts`,
    gated on SEARCH_API_URL (skipped without it).
 7. Run `npm test` (post routes derive from POST_DEFS, so new posts are
    covered automatically), screenshot-check desktop + 390px widths using

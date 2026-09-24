@@ -27,21 +27,25 @@ test("routes return 200", async ({ request, baseURL }) => {
 	}
 });
 
-// The search API needs a D1 binding, which `next start` does not provide
-// (verified for real under `opennext preview`). Contract: without a
-// database it answers 503 + fallback:true, and the client uses the bundled
-// static index instead. With D1 it answers 200 + ranked slugs.
-test("search API degrades to the static-index contract", async ({
+// The search/listing APIs need a D1 binding. Under `next start` the
+// platform proxy may or may not have resolved it by request time (a startup
+// race — verified flaky both ways), so this asserts the SHAPE contract,
+// not a fixed status: 200 carries posts + source:'d1'; 503 carries an
+// explicit error and the UI reports unavailability instead of fake results.
+// Real D1 behavior is pinned by tests/search-d1.spec.ts under preview/prod.
+test("APIs answer the shape contract with or without a database", async ({
 	request,
 	baseURL,
 }) => {
-	const res = await request.get(`${baseURL}/api/search?q=tetlock`);
-	const body = await res.json();
-	if (res.status() === 200) {
-		expect(Array.isArray(body.slugs)).toBe(true);
-	} else {
-		expect(res.status()).toBe(503);
-		expect(body.fallback).toBe(true);
+	for (const route of ["/api/search?q=tetlock", "/api/posts", "/api/tags"]) {
+		const res = await request.get(`${baseURL}${route}`);
+		const body = await res.json();
+		if (res.status() === 200) {
+			expect(["d1", "d1-fts5"], route).toContain(body.source);
+		} else {
+			expect(res.status(), route).toBe(503);
+			expect(body.error, route).toMatch(/unavailable/);
+		}
 	}
 });
 

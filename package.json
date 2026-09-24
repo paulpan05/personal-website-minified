@@ -5,11 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "node scripts/build-search-index.mjs",
     "start": "next start",
     "lint": "next lint",
     "pretest": "playwright install chromium",
-    "test": "npm run build && playwright test",
+    "test": "next build && playwright test",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

@@ -31,7 +31,9 @@ interface PostDef extends PostMeta {
 // (there is no fs on Cloudflare Workers). To add a post: drop an .mdx file
 // in ./posts/ and add one entry below, with publishedAt set to the real
 // go-live time (never backdate to a draft's date).
-const POST_DEFS: PostDef[] = [
+// Exported for the D1 seed script (scripts/seed-search-db.mjs), which reads
+// metadata from the single source of truth instead of fragile regex parsing.
+export const POST_DEFS: PostDef[] = [
   {
     slug: 'benchmark-intelligence-gap',
     title:

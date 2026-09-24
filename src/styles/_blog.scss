@@ -136,6 +136,16 @@
   border-top: 1px solid $blog-table-border;
   font-family: $font-display;
   color: $blog-muted;
+
+  button {
+    font: inherit;
+    color: $link-on-dark;
+    background: none;
+    border: none;
+    padding: 0.375em 0.25em;
+    min-height: 44px;
+    cursor: pointer;
+  }
 }
 
 .blog-meta,

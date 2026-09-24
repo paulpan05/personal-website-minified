@@ -48,7 +48,7 @@ export default async function BlogIndex({
         {posts.length === 0 ? (
           <p>No posts yet.</p>
         ) : (
-          <BlogSearch posts={posts}>
+          <BlogSearch>
             {groupByYear(pagePosts).map(([year, yearPosts]) => (
               <section
                 key={year}

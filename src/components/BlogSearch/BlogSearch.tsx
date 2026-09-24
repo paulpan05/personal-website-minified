@@ -1,184 +1,154 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { PostMeta } from '@/content/posts'
 import BlogEntry from '@/components/BlogEntry/BlogEntry'
 
-interface SearchIndex {
-  version: number
-  slugs: string[]
-  stopwords: string[]
-  postings: Record<string, Array<[number, number]>>
+interface ApiPostRow {
+  slug: string
+  title: string
+  published_at: string
+  description: string
+  tags: string
+  reading_minutes: number
+  provenance: string
 }
 
-function wordTokens(text: string): string[] {
-  return text.toLowerCase().match(/[a-z0-9]+/g) ?? []
-}
-
-interface RankedPost {
-  post: PostMeta
-  score: number
-}
-
-function rankPosts(
-  candidates: PostMeta[],
-  queryTokens: string[],
-  stopwords: Set<string>,
-  index: SearchIndex,
-): RankedPost[] {
-  const tokens = queryTokens.filter(
-    (token) => token.length >= 2 && !stopwords.has(token),
-  )
-  if (tokens.length === 0) {
-    return candidates.map((post) => ({ post, score: 0 }))
+function toMeta(row: ApiPostRow): PostMeta {
+  return {
+    slug: row.slug,
+    title: row.title,
+    publishedAt: row.published_at,
+    description: row.description,
+    tags: JSON.parse(row.tags) as string[],
+    readingMinutes: row.reading_minutes,
+    provenance: row.provenance as PostMeta['provenance'],
   }
-  const slugToIndex = new Map(index.slugs.map((slug, i) => [slug, i]))
-  const ranked: RankedPost[] = []
-  for (const post of candidates) {
-    const titleWords = new Set(wordTokens(post.title))
-    const tagWords = new Set(post.tags.flatMap(wordTokens))
-    const slugIndex = slugToIndex.get(post.slug)
-    let score = 0
-    let matched = true
-    for (const token of tokens) {
-      const inTitle = titleWords.has(token)
-      const inTags = tagWords.has(token)
-      const posting = slugIndex === undefined
-        ? undefined
-        : index.postings[token]?.find(([i]) => i === slugIndex)
-      if (!inTitle && !inTags && !posting) {
-        matched = false
-        break
-      }
-      score += (inTitle ? 10 : 0) + (inTags ? 5 : 0) + (posting?.[1] ?? 0)
-    }
-    if (matched) {
-      ranked.push({ post, score })
-    }
-  }
-  // Stable sort: candidates arrive newest-first, so date ties keep it.
-  ranked.sort((a, b) => b.score - a.score)
-  return ranked
 }
 
+async function fetchJson<T>(url: string): Promise<T> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 5000)
+  try {
+    const res = await fetch(url, { signal: controller.signal })
+    if (!res.ok) {
+      throw new Error(`request failed: ${res.status}`)
+    }
+    return (await res.json()) as T
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+/**
+ * Archive browser. Reads listing metadata, tags, and search hits from the
+ * D1-backed API routes — the client never holds more than one page of
+ * posts, at any archive size. The server-rendered first page (children)
+ * stays as the SEO/no-JS baseline and the inactive view.
+ */
 export default function BlogSearch({
-  posts,
   children,
 }: {
-  posts: PostMeta[]
-  /** Server-rendered default list (SEO + no-JS); shown when inactive. */
   children: ReactNode
 }) {
   const [query, setQuery] = useState('')
   const [activeTag, setActiveTag] = useState<string | null>(null)
-  const [index, setIndex] = useState<SearchIndex | null>(null)
-  // Slugs ranked by the D1 FTS5 API (bm25). Null until the API answers;
-  // a failed API falls back to the bundled static index below.
-  const [apiSlugs, setApiSlugs] = useState<string[] | null>(null)
-  const indexPromise = useRef<Promise<SearchIndex> | null>(null)
+  const [tags, setTags] = useState<string[] | null>(null)
+  const [results, setResults] = useState<PostMeta[] | null>(null)
+  const [resultPage, setResultPage] = useState({ page: 1, totalPages: 1 })
+  const [resultMeta, setResultMeta] = useState('')
+  const [unavailable, setUnavailable] = useState(false)
 
-  const tags = useMemo(
-    () => [...new Set(posts.flatMap((post) => post.tags))].sort(),
-    [posts],
-  )
-  const queryTokens = useMemo(() => wordTokens(query.trim()), [query])
-  const filtering = queryTokens.length > 0 || activeTag !== null
+  const trimmed = query.trim()
+  const filtering = trimmed !== '' || activeTag !== null
 
-  // Lazy-load the full-text index on first search keystroke — never part
-  // of the initial bundle. Tag-only filtering needs no index at all.
-  const loadStaticIndex = () => {
-    if (index || indexPromise.current) {
-      return
-    }
-    indexPromise.current = import('@/content/search-index.json').then(
-      (mod) => {
-        const loaded = (mod.default ?? mod) as unknown as SearchIndex
-        setIndex(loaded)
-        return loaded
-      },
-    )
-  }
-
-  // Prefer the D1 FTS5 API (porter stemming, bm25); fall back to the
-  // bundled static index when the API has no database (local `next start`,
-  // unmigrated environments). Debounced per keystroke.
+  // Topic chips, fetched once. Hidden (not faked) if the API is down.
   useEffect(() => {
-    setApiSlugs(null)
-    if (queryTokens.length === 0) {
+    fetchJson<{ tags: string[] }>('/api/tags')
+      .then((data) => setTags(data.tags))
+      .catch(() => setTags([]))
+  }, [])
+
+  // Debounced search/listing fetch. Tag-only browsing pages through
+  // /api/posts; text queries go to /api/search (D1 FTS5, title/tag
+  // re-boosted client-side over the bm25 order it returns).
+  useEffect(() => {
+    if (!filtering) {
+      setResults(null)
+      setUnavailable(false)
       return
     }
-    const trimmed = query.trim()
     let cancelled = false
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 2500)
     const timer = setTimeout(() => {
-      fetch(`/api/search?q=${encodeURIComponent(trimmed)}`, {
-        signal: controller.signal,
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            throw new Error('search API unavailable')
+      const run = async () => {
+        try {
+          if (trimmed !== '') {
+            const params = new URLSearchParams({ q: trimmed })
+            if (activeTag) {
+              params.set('tag', activeTag)
+            }
+            const data = await fetchJson<{
+              posts: ApiPostRow[]
+            }>(`/api/search?${params}`)
+            if (cancelled) {
+              return
+            }
+            const ranked = data.posts.map(toMeta)
+            setResults(ranked)
+            setResultPage({ page: 1, totalPages: 1 })
+            const parts = [`${ranked.length} essay${ranked.length === 1 ? '' : 's'} matching “${trimmed}”`]
+            if (activeTag) {
+              parts.push(`in “${activeTag}”`)
+            }
+            setResultMeta(parts.join(' '))
+          } else {
+            const data = await fetchJson<{
+              posts: ApiPostRow[]
+              page: number
+              totalPages: number
+              total: number
+            }>(`/api/posts?tag=${encodeURIComponent(activeTag ?? '')}&page=1`)
+            if (cancelled) {
+              return
+            }
+            setResults(data.posts.map(toMeta))
+            setResultPage({ page: data.page, totalPages: data.totalPages })
+            setResultMeta(
+              `${data.total} essay${data.total === 1 ? '' : 's'} in “${activeTag}”`,
+            )
           }
-          const data = (await res.json()) as { slugs: string[] }
+          setUnavailable(false)
+        } catch {
           if (!cancelled) {
-            setApiSlugs(data.slugs)
+            setUnavailable(true)
           }
-        })
-        .catch(() => {
-          if (!cancelled) {
-            loadStaticIndex()
-          }
-        })
+        }
+      }
+      void run()
     }, 200)
     return () => {
       cancelled = true
       clearTimeout(timer)
-      clearTimeout(timeout)
-      controller.abort()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query])
+  }, [query, activeTag, filtering, trimmed])
 
-  const results = useMemo<RankedPost[] | null>(() => {
-    if (!filtering) {
-      return null
-    }
-    const candidates = activeTag
-      ? posts.filter((post) => post.tags.includes(activeTag))
-      : posts
-    if (queryTokens.length === 0) {
-      return candidates.map((post) => ({ post, score: 0 }))
-    }
-    if (apiSlugs !== null) {
-      // D1 answered: keep bm25 order, apply the tag filter client-side,
-      // re-boost title/tag hits so metadata still outranks body mentions.
-      const order = new Map(apiSlugs.map((slug, i) => [slug, i]))
-      const matched = candidates.filter((post) => order.has(post.slug))
-      const titleBoost = (post: PostMeta) => {
-        const titleWords = new Set(wordTokens(post.title))
-        const tagWords = new Set(post.tags.flatMap(wordTokens))
-        return queryTokens.reduce(
-          (sum, token) =>
-            sum + (titleWords.has(token) ? 10 : 0) + (tagWords.has(token) ? 5 : 0),
-          0,
-        )
-      }
-      matched.sort(
-        (a, b) =>
-          order.get(a.slug)! - order.get(b.slug)! ||
-          titleBoost(b) - titleBoost(a),
-      )
-      return matched.map((post) => ({ post, score: 0 }))
-    }
-    if (!index) {
-      return null
-    }
-    return rankPosts(candidates, queryTokens, new Set(index.stopwords), index)
-  }, [filtering, activeTag, posts, queryTokens, apiSlugs, index])
+  const turnTagPage = (direction: 1 | -1) => {
+    const next = resultPage.page + direction
+    fetchJson<{
+      posts: ApiPostRow[]
+      page: number
+      totalPages: number
+    }>(`/api/posts?tag=${encodeURIComponent(activeTag ?? '')}&page=${next}`)
+      .then((data) => {
+        setResults(data.posts.map(toMeta))
+        setResultPage({ page: data.page, totalPages: data.totalPages })
+        setUnavailable(false)
+      })
+      .catch(() => setUnavailable(true))
+  }
 
-  const loadingText =
-    queryTokens.length > 0 && apiSlugs === null && index === null
+  const chips = useMemo(() => tags ?? [], [tags])
 
   return (
     <div className="blog-search">
@@ -193,9 +163,9 @@ export default function BlogSearch({
           onChange={(event) => setQuery(event.target.value)}
         />
       </label>
-      {tags.length > 0 && (
+      {chips.length > 0 && (
         <div className="tag-chips" role="group" aria-label="Filter by topic">
-          {tags.map((tag) => (
+          {chips.map((tag) => (
             <button
               key={tag}
               type="button"
@@ -208,31 +178,56 @@ export default function BlogSearch({
           ))}
         </div>
       )}
-      {results === null ? (
+      {results === null && !unavailable ? (
         children
       ) : (
         <div className="search-results" aria-live="polite">
-          {loadingText ? (
-            <p className="search-meta">Searching…</p>
-          ) : results.length === 0 ? (
+          {unavailable ? (
             <p className="search-meta">
-              No essays match{query.trim() !== '' ? ` “${query.trim()}”` : ''}
+              Search is unavailable right now. Showing the latest essays
+              below — try again in a moment.
+            </p>
+          ) : results !== null && results.length === 0 ? (
+            <p className="search-meta">
+              No essays match{trimmed !== '' ? ` “${trimmed}”` : ''}
               {activeTag ? ` in “${activeTag}”` : ''}.
             </p>
           ) : (
-            <>
-              <p className="search-meta">
-                {results.length} of {posts.length} essays
-                {activeTag ? ` in “${activeTag}”` : ''}
-                {query.trim() !== '' ? ` matching “${query.trim()}”` : ''}.
-              </p>
-              <ul className="blog-list">
-                {results.map(({ post }) => (
-                  <BlogEntry key={post.slug} post={post} />
-                ))}
-              </ul>
-            </>
+            results !== null && (
+              <>
+                <p className="search-meta">{resultMeta}.</p>
+                <ul className="blog-list">
+                  {results.map((post) => (
+                    <BlogEntry key={post.slug} post={post} />
+                  ))}
+                </ul>
+                {resultPage.totalPages > 1 && (
+                  <nav className="blog-pages" aria-label="Filtered essay pages">
+                    {resultPage.page > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => turnTagPage(-1)}
+                      >
+                        ← Newer
+                      </button>
+                    )}
+                    <span aria-current="page">
+                      Page {resultPage.page} of {resultPage.totalPages}
+                    </span>
+                    {resultPage.page < resultPage.totalPages && (
+                      <button
+                        type="button"
+                        onClick={() => turnTagPage(1)}
+                      >
+                        Older →
+                      </button>
+                    )}
+                  </nav>
+                )}
+              </>
+            )
           )}
+          {unavailable && children}
         </div>
       )}
     </div>
