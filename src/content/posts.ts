@@ -24,6 +24,11 @@ interface PostDef extends PostMeta {
 // bundled at build time, so nothing here touches the filesystem at runtime
 // (there is no fs on Cloudflare Workers). To add a post: drop an .mdx file
 // in ./posts/ and add one entry below.
+//
+// Ordering: newest day first. Same-day posts keep registry order (the sort
+// is stable), so sequence same-day entries deliberately — topmost newest.
+// Day granularity is intentional: readers care about day order, and the
+// registry order covers intraday sequencing without timestamp bookkeeping.
 const POST_DEFS: PostDef[] = [
   {
     slug: 'benchmark-intelligence-gap',
