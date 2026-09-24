@@ -1,11 +1,27 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { formatPostDate, getAllPosts } from '@/content/posts'
+import { getAllPosts } from '@/content/posts'
+import type { PostMeta } from '@/content/posts'
 import { SITE_NAME } from '@/lib/site'
+import BlogEntry from '@/components/BlogEntry/BlogEntry'
+import BlogSearch from '@/components/BlogSearch/BlogSearch'
 
 export const metadata: Metadata = {
   title: `Writing — ${SITE_NAME}`,
   description: 'Essays and longform writing by Paul Pan.',
+}
+
+function groupByYear(posts: PostMeta[]): Array<[string, PostMeta[]]> {
+  const groups = new Map<string, PostMeta[]>()
+  for (const post of posts) {
+    const year = post.date.slice(0, 4)
+    const group = groups.get(year)
+    if (group) {
+      group.push(post)
+    } else {
+      groups.set(year, [post])
+    }
+  }
+  return [...groups.entries()].sort(([a], [b]) => (a < b ? 1 : -1))
 }
 
 export default function BlogIndex() {
@@ -17,23 +33,22 @@ export default function BlogIndex() {
         {posts.length === 0 ? (
           <p>No posts yet.</p>
         ) : (
-          <ul className="blog-list">
-            {posts.map((post) => (
-              <li key={post.slug}>
-                <h2>
-                  <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                </h2>
-                <p className="blog-meta">
-                  <time dateTime={post.date}>{formatPostDate(post.date)}</time>
-                  {' · '}
-                  {post.readingMinutes} min read
-                  {' · '}
-                  {post.provenance}
-                </p>
-                <p>{post.description}</p>
-              </li>
+          <BlogSearch posts={posts}>
+            {groupByYear(posts).map(([year, yearPosts]) => (
+              <section
+                key={year}
+                className="blog-year"
+                aria-labelledby={`year-${year}`}
+              >
+                <h2 id={`year-${year}`}>{year}</h2>
+                <ul className="blog-list">
+                  {yearPosts.map((post) => (
+                    <BlogEntry key={post.slug} post={post} />
+                  ))}
+                </ul>
+              </section>
             ))}
-          </ul>
+          </BlogSearch>
         )}
       </main>
     </div>

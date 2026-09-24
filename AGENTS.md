@@ -63,7 +63,16 @@ OpenNext. Canonical origin: `https://paulpan.net`
    (see `ArcAgiChart`). Every figure needs `<title>`/`<desc>`, a numbered
    `<figcaption>`, and must not overclaim the data (e.g. snapshots from
    different harnesses are not a learning curve — say so in the caption).
-4. Run `npm test` (post routes derive from POST_DEFS, so new posts are
+4. The search index regenerates itself: `prebuild` runs
+   `scripts/build-search-index.mjs` before every `npm run build` (and
+   `npm test` builds first, so it is covered there too). Commit the
+   regenerated `src/content/search-index.json` with the post — never
+   hand-edit it. The index lazy-loads on first search keystroke; post
+   metadata for ranking comes from `POST_DEFS`, already in the bundle.
+5. The index page groups posts by year (server-rendered, SEO + no-JS safe)
+   with a client search box (full-text over the index, title ×10 / tag ×5 /
+   body-count scoring, all query tokens must match) and tag filter chips.
+6. Run `npm test` (post routes derive from POST_DEFS, so new posts are
    covered automatically), screenshot-check desktop + 390px widths using
    Playwright's bundled chromium — never the system-Chrome `--screenshot`
    CLI, which mis-scales viewports and produces false overflow alarms.

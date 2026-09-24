@@ -56,6 +56,75 @@
   }
 }
 
+// Year archive sections (server-rendered default list).
+.blog-year {
+  margin-top: 2.5em;
+
+  > h2 {
+    font-size: 1.25rem;
+    color: $blog-muted;
+    border-bottom: 1px solid $blog-table-border;
+    padding-bottom: 0.5em;
+  }
+}
+
+// Search + topic filter. The full-text index lazy-loads on first keystroke;
+// the default list stays server-rendered for SEO and no-JS readers.
+.blog-search {
+  margin-top: 1.5em;
+}
+
+.search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  font-family: $font-display;
+  color: $blog-muted;
+
+  input {
+    font-family: $font-display;
+    font-size: 1rem;
+    color: $blog-ink;
+    background-color: $blog-pre-bg;
+    border: 1px solid $blog-table-border;
+    border-radius: 0.375em;
+    padding: 0.75em 1em;
+    // 44px+ touch target.
+    min-height: 44px;
+    max-width: 70ch;
+  }
+}
+
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-top: 1em;
+}
+
+.tag-chip {
+  font-family: $font-display;
+  font-size: 0.875rem;
+  color: $blog-ink;
+  background: none;
+  border: 1px solid $blog-table-border;
+  border-radius: 999px;
+  padding: 0.5em 1em;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.tag-chip[aria-pressed='true'] {
+  color: $link-on-dark;
+  border-color: $link-on-dark;
+}
+
+.search-meta {
+  font-family: $font-display;
+  color: $blog-muted;
+  margin-top: 1.5em;
+}
+
 .blog-meta,
 .blog-tags {
   font-family: $font-display;
