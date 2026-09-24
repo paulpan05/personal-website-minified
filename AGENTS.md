@@ -81,6 +81,15 @@ OpenNext. Canonical origin: `https://paulpan.net`
   tag chips + search box (title ×10 / tag ×5 / body-count scoring, all
   query tokens must match). RSS capped at the 20 latest. Smoke tests
   enumerate all routes up to 25 posts, then sample deterministically.
+- Scale, measured 2026-09-24 with 500 synthetic posts in a scratch copy:
+  full build <2 min, 510 static pages, First Load JS unchanged at ~107 kB
+  (listing metadata travels in the RSC payload, not the bundle — pagination
+  caps it). Static index stays small only while vocabulary is shared; real
+  diverse content ≈ 20 KB/post, so ~10 MB at 500 — D1 is already primary.
+  Re-measure with `scripts/gen-fixture-posts.mjs <copy> <N>` before
+  assuming headroom. Triggers for the next migration (dynamic post
+  rendering, R2 bodies): build approaching CI timeouts, or static index
+  exceeding ~2 MB.
 
 1. Add `src/content/posts/<slug>.mdx` (no frontmatter — metadata lives in
    `POST_DEFS` in `src/content/posts.ts`).
