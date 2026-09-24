@@ -25,6 +25,11 @@ OpenNext. Canonical origin: `https://paulpan.net`
 3. `src/mdx-components.tsx` is load-bearing. Without it MDX falls back to
    `@mdx-js/react`, which crashes Server Components
    (`e.createContext is not a function`).
+4. SQLite `INSERT OR REPLACE` does NOT fire `AFTER DELETE` triggers for its
+   conflict-resolution delete — reseeds written that way silently accumulate
+   duplicate FTS rows (observed: 3 posts → 6 FTS rows, every query doubled).
+   Seeds must use explicit `DELETE` + `INSERT` pairs; the plain `DELETE`
+   fires the sync trigger. Verified empirically, not from docs.
 
 ## Conventions
 
@@ -46,7 +51,9 @@ OpenNext. Canonical origin: `https://paulpan.net`
   toggle pinned top-right via flex order). The footer repeats the section
   links. Keep footer `.site-links` rules out of nav-only selectors.
 - Post footer navigation uses `getAdjacentPosts()` from the registry.
-- No snapshot/image tests. Smoke tests only (`tests/smoke.spec.ts`).
+- No snapshot/image tests. Two suites: `tests/smoke.spec.ts` (route 200s +
+  mobile overflow, runs in `npm test`) and `tests/search-d1.spec.ts`
+  (real-D1 behavior, gated on `SEARCH_API_URL`, run under preview/prod).
 - Keep `/test-results` and `/playwright-report` out of git (ignored).
 - Provenance: every post carries exactly one `provenance` value —
   `AI-assisted` (AI-drafted under the author's direction; needs a process
@@ -59,10 +66,13 @@ OpenNext. Canonical origin: `https://paulpan.net`
   `scripts/seed-search-db.mjs` (imports the registry through Node type
   stripping — no regex parsing) and holds the full row: slug, title,
   published_at, description, tags, reading_minutes, provenance, body.
-  Regeneration is whole-table INSERT OR REPLACE, so code and database
-  cannot diverge. There is no static index and no silent fallback.
+  Regeneration is whole-table DELETE + INSERT (never INSERT OR REPLACE —
+  see landmine 4), so code and database cannot diverge. There is no static
+  index and no silent fallback.
 - Schema: `migrations/0001_search.sql` (posts + porter-stemmed FTS5 +
-  sync triggers), `migrations/0002_metadata.sql` (metadata columns).
+  sync triggers), `migrations/0002_metadata.sql` (metadata columns),
+  `migrations/0003_fix_fts_triggers.sql` (plain-DELETE trigger bodies +
+  one-time rebuild — the pre-fix triggers used a no-op delete form).
   `cloudflare-env.d.ts` is force-tracked (generated, but
   fresh clones need it for `D1Database` types) — regenerate with
   `npm run cf-typegen` whenever bindings change and commit the result.
@@ -79,12 +89,14 @@ OpenNext. Canonical origin: `https://paulpan.net`
   may not resolve the platform proxy at request time; the smoke shape
   test accepts both tiers. Real D1 behavior is pinned by
   `tests/search-d1.spec.ts` under preview/prod.)
-- Local: `npx wrangler d1 execute DB --local --file=migrations/0001_search.sql`
-  once (plus 0002), then `--file=d1/seed.sql` after each batch of posts.
+- Local: apply everything in `migrations/` once
+  (`npx wrangler d1 execute DB --local --file=...` per file, in order),
+  then `--file=d1/seed.sql` after each batch of posts.
   Verify under the real Worker (`npm run preview`, :8787).
-- Remote (needs `wrangler login` + real `database_id` in wrangler.jsonc,
-  or just `npm run setup:d1`): `wrangler d1 create
-  personal-website-search`, `wrangler d1 migrations apply DB --remote`,
+- Remote: `npm run setup:d1` (checks login, creates the DB if needed,
+  patches the id, applies migrations, seeds, verifies counts). Manual
+  equivalent: `wrangler d1 create personal-website-search`,
+  `wrangler d1 migrations apply DB --remote`,
   `wrangler d1 execute DB --remote --file=d1/seed.sql`.
 - Proving prod reads D1:
   `SEARCH_API_URL=https://paulpan.net npx playwright test tests/search-d1.spec.ts`.
@@ -92,17 +104,18 @@ OpenNext. Canonical origin: `https://paulpan.net`
   it fails but smoke passes, prod has no database — check
   migrations/seeding. Dashboard Workers + D1 analytics corroborate.
 - Index page: 20 essays per page (`?page=N`), year subheads per page,
-  tag chips + search box (title ×10 / tag ×5 / body-count scoring, all
-  query tokens must match). RSS capped at the 20 latest. Smoke tests
+  tag chips + search box (FTS5 bm25 ranking over quoted per-token prefix
+  matches, all tokens ANDed; tokens must be ≥2 chars, max 8 per query).
+  RSS capped at the 20 latest. Smoke tests
   enumerate all routes up to 25 posts, then sample deterministically.
 - Scale, measured 2026-09-24 with 500 synthetic posts in a scratch copy:
   full build <2 min, 510 static pages, First Load JS unchanged at ~107 kB
   (listing metadata travels in the RSC payload, not the bundle — pagination
-  caps it). Static index stays small only while vocabulary is shared; real
-  diverse content ≈ 20 KB/post, so ~10 MB at 500 — D1 is already primary.
-  Re-measure with `scripts/gen-fixture-posts.mjs <copy> <N>` before
-  assuming headroom. Triggers for the next migration (dynamic post
-   rendering, R2 bodies): build approaching CI timeouts.
+  caps it). D1 is the only query tier, so per-post body growth does not
+  touch the bundle. Re-measure with
+  `scripts/gen-fixture-posts.mjs <copy> <N>` before assuming headroom.
+  Triggers for the next migration (dynamic post rendering, R2 bodies):
+  build approaching CI timeouts.
 
 ## Publishing a post
 
@@ -133,6 +146,6 @@ OpenNext. Canonical origin: `https://paulpan.net`
    and scroll through the page step by step — viewport-only shots miss
    section-level defects (e.g. white-on-paper cards halfway down).
    Commit + push.
-5. Restart any `next start` preview server after rebuilding: a running
+8. Restart any `next start` preview server after rebuilding: a running
    server serves stale CSS/JS and produces misleading screenshots and
    probes. Kill, rebuild, restart, then verify.
