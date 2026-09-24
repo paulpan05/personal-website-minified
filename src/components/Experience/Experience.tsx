@@ -3,8 +3,8 @@ import { experienceCards } from '@/data/subsections'
 
 export default function Experience() {
   return (
-    <section className="experience" aria-labelledby="experience-heading">
-      <h2 id="experience-heading">Experience</h2>
+    <section className="experience" id="experience" aria-labelledby="experience-heading">
+      <h2 id="experience-heading"><span aria-hidden="true" className="prompt">$ </span>Experience</h2>
       {experienceCards.map((card, index) => (
         <article className="card" key={index}>
           <Image src={card.logo} alt={card.company} width={120} height={120} loading="lazy" />

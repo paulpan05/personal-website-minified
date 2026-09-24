@@ -32,6 +32,11 @@ OpenNext. Canonical origin: `https://paulpan.net`
   hardcode palette/typeface values.
 - Type voices: `$font-display` (monospace) for headings/nav/meta/code,
   `$font-body` (system sans) for prose.
+- Site chrome (`SiteNav`, `SiteFooter`) renders once in `src/app/layout.tsx`,
+  not per page. `SiteNav` is a client component (active state via pathname +
+  hash). Homepage sections carry anchor ids (`#about`, `#experience`,
+  `#projects`, `#contact`) that the nav targets.
+- Post footer navigation uses `getAdjacentPosts()` from the registry.
 - No snapshot/image tests. Smoke tests only (`tests/smoke.spec.ts`).
 - Keep `/test-results` and `/playwright-report` out of git (ignored).
 - Provenance: every post carries exactly one `provenance` value —

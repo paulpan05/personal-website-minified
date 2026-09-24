@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import SiteNav from '@/components/SiteNav/SiteNav'
 import { formatPostDate, getAllPosts } from '@/content/posts'
 import { SITE_NAME } from '@/lib/site'
 
@@ -13,7 +12,6 @@ export default function BlogIndex() {
   const posts = getAllPosts()
   return (
     <div className="blog">
-      <SiteNav />
       <main className="blog-index">
         <h1>Writing</h1>
         {posts.length === 0 ? (

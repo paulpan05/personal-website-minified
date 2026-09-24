@@ -2,8 +2,8 @@ import { highlightedProjectsCards } from '@/data/subsections'
 
 export default function HighlightedProjects() {
   return (
-    <section className="highlighted-projects" aria-labelledby="projects-heading">
-      <h2 id="projects-heading">Highlighted Projects</h2>
+    <section className="highlighted-projects" id="projects" aria-labelledby="projects-heading">
+      <h2 id="projects-heading"><span aria-hidden="true" className="prompt">$ </span>Highlighted Projects</h2>
       {highlightedProjectsCards.map((card, index) => (
         <article key={index} className="card">
           <h3>{card.shortDescription}</h3>

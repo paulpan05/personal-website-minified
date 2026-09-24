@@ -1,7 +1,13 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import SiteNav from '@/components/SiteNav/SiteNav'
-import { formatPostDate, getPost, getPostSlugs, loadPostContent } from '@/content/posts'
+import {
+  formatPostDate,
+  getAdjacentPosts,
+  getPost,
+  getPostSlugs,
+  loadPostContent,
+} from '@/content/posts'
 import { SITE_AUTHOR, SITE_URL } from '@/lib/site'
 
 interface PostPageParams {
@@ -53,15 +59,16 @@ export default async function BlogPost({
   const { slug } = await params
   let post
   let Content
+  let adjacent
   try {
     post = getPost(slug)
     ;({ default: Content } = await loadPostContent(slug))
+    adjacent = getAdjacentPosts(slug)
   } catch {
     notFound()
   }
   return (
     <div className="blog">
-      <SiteNav />
       <main>
         <article className="blog-post">
           <header>
@@ -79,6 +86,27 @@ export default async function BlogPost({
           </header>
           <Content />
         </article>
+        <footer className="post-footer">
+          <Link href="/blog" className="post-footer-index">
+            ← All writing
+          </Link>
+          <nav className="post-footer-adjacent" aria-label="More essays">
+            {adjacent.older ? (
+              <Link href={`/blog/${adjacent.older.slug}`}>
+                ← Older: {adjacent.older.title}
+              </Link>
+            ) : (
+              <span />
+            )}
+            {adjacent.newer ? (
+              <Link href={`/blog/${adjacent.newer.slug}`}>
+                Newer: {adjacent.newer.title} →
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
+        </footer>
       </main>
     </div>
   )

@@ -89,6 +89,23 @@ export function getAllPosts(): PostMeta[] {
   )
 }
 
+export interface AdjacentPosts {
+  newer: PostMeta | null
+  older: PostMeta | null
+}
+
+export function getAdjacentPosts(slug: string): AdjacentPosts {
+  const posts = getAllPosts()
+  const index = posts.findIndex((post) => post.slug === slug)
+  if (index === -1) {
+    throw new Error(`Unknown post slug: ${slug}`)
+  }
+  return {
+    newer: index > 0 ? posts[index - 1] : null,
+    older: index < posts.length - 1 ? posts[index + 1] : null,
+  }
+}
+
 export function loadPostContent(slug: string): Promise<MdxModule> {
   return findDef(slug).load()
 }

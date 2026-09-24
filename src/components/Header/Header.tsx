@@ -1,10 +1,8 @@
 import Image from 'next/image'
-import SiteNav from '@/components/SiteNav/SiteNav'
 
 export default function Header() {
   return (
     <header className="header">
-      <SiteNav />
       <Image
         src='/image/profile_picture.jpg'
         alt='Profile Picture'

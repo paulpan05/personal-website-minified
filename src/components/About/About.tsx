@@ -2,8 +2,8 @@ import { aboutMeText, aboutThisSiteText, repoLink } from '@/data/paragraphs'
 
 export default function About() {
   return (
-    <section className="about" aria-labelledby="about-heading">
-      <h2 id="about-heading">About</h2>
+    <section className="about" id="about" aria-labelledby="about-heading">
+      <h2 id="about-heading"><span aria-hidden="true" className="prompt">$ </span>About</h2>
       <h3>Me</h3>
       <p>{aboutMeText}</p>
       <h3>This site</h3>

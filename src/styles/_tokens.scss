@@ -17,6 +17,10 @@ $font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 $link-on-light: #8a0038;
 $link-on-dark: #ffc6d5;
 
+// Terminal chrome: ink borders and paper card surfaces on light sections.
+$ink: #1a1a1a;
+$paper: #fffdf7;
+
 // Homepage section surfaces.
 $header-gradient-start: #fde0d9;
 $header-gradient-end: #fff2cc;
