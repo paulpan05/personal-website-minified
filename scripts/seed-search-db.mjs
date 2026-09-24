@@ -57,4 +57,8 @@ for (const def of POST_DEFS) {
 }
 
 process.stdout.write(`${statements.join('\n')}\n`)
+// Merge FTS5 delete-tombstones left by INSERT OR REPLACE: without this,
+// reseeds can return duplicate rows until SQLite merges on its own
+// schedule (observed in production, not locally — hence explicit).
+process.stdout.write(`INSERT INTO posts_fts (posts_fts) VALUES ('optimize');\n`)
 console.error(`seed: ${statements.length} posts -> d1/seed.sql format (stdout)`)
