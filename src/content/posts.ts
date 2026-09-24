@@ -49,6 +49,17 @@ const POST_DEFS: PostDef[] = [
     readingMinutes: 45,
     load: () => import('./posts/frontier-models-september-2026.mdx'),
   },
+  {
+    slug: 'who-predicts-well',
+    title: 'Who Predicts Well, and Why: The Evidence on Expert Forecasting',
+    date: '2026-09-23',
+    description:
+      'Peer-reviewed sources only. Foxes beat hedgehogs, tasks set the ceiling, institutions decide what gets heard — what the evidence says about expert forecasting.',
+    tags: ['forecasting', 'expert judgment', 'survey'],
+    provenance: 'AI-assisted',
+    readingMinutes: 19,
+    load: () => import('./posts/who-predicts-well.mdx'),
+  },
 ]
 
 function toMeta({ load: _load, ...meta }: PostDef): PostMeta {
