@@ -39,7 +39,7 @@ export async function generateMetadata({
       title: post.title,
       description: post.description,
       type: 'article',
-      publishedTime: post.date,
+      publishedTime: post.publishedAt,
       authors: [SITE_AUTHOR],
       url,
     },
@@ -74,7 +74,7 @@ export default async function BlogPost({
           <header>
             <h1>{post.title}</h1>
             <p className="blog-meta">
-              <time dateTime={post.date}>{formatPostDate(post.date)}</time>
+              <time dateTime={post.publishedAt}>{formatPostDate(post.publishedAt)}</time>
               {' · '}
               {post.readingMinutes} min read
               {' · '}

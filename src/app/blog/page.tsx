@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 function groupByYear(posts: PostMeta[]): Array<[string, PostMeta[]]> {
   const groups = new Map<string, PostMeta[]>()
   for (const post of posts) {
-    const year = post.date.slice(0, 4)
+    const year = post.publishedAt.slice(0, 4)
     const group = groups.get(year)
     if (group) {
       group.push(post)

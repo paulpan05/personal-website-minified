@@ -22,7 +22,7 @@ export async function GET(): Promise<Response> {
       <guid>${SITE_URL}/blog/${post.slug}</guid>
       <description>${escapeXml(post.description)}</description>
       <author>${escapeXml(SITE_AUTHOR)}</author>
-      <pubDate>${new Date(`${post.date}T00:00:00Z`).toUTCString()}</pubDate>
+      <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
     </item>`,
     )
     .join('\n')

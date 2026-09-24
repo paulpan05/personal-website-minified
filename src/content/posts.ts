@@ -7,7 +7,13 @@ export interface MdxModule {
 export interface PostMeta {
   slug: string
   title: string
-  date: string
+  /** Go-live moment, full ISO 8601 (e.g. '2026-09-22T22:07:47-04:00').
+   *  Single source for display, sort, sitemap, and RSS — industry-standard
+   *  timestamp storage; day-only display is a presentation choice made by
+   *  the formatters, in UTC. Set a new post's value to its actual go-live
+   *  time; full precision makes same-day ties impossible, so no registry-
+   *  order tiebreak is needed (or allowed to matter). */
+  publishedAt: string
   description: string
   tags: string[]
   readingMinutes: number
@@ -23,18 +29,14 @@ interface PostDef extends PostMeta {
 // Single source of truth for post metadata. Content lives in ./posts/ and is
 // bundled at build time, so nothing here touches the filesystem at runtime
 // (there is no fs on Cloudflare Workers). To add a post: drop an .mdx file
-// in ./posts/ and add one entry below.
-//
-// Ordering: newest day first. Same-day posts keep registry order (the sort
-// is stable), so sequence same-day entries deliberately — topmost newest.
-// Day granularity is intentional: readers care about day order, and the
-// registry order covers intraday sequencing without timestamp bookkeeping.
+// in ./posts/ and add one entry below, with publishedAt set to the real
+// go-live time (never backdate to a draft's date).
 const POST_DEFS: PostDef[] = [
   {
     slug: 'benchmark-intelligence-gap',
     title:
       'The Benchmark–Intelligence Gap: Why High Scores Overstate Fluid and Commonsense Intelligence',
-    date: '2026-09-23',
+    publishedAt: '2026-09-22T22:07:47-04:00',
     description:
       'Benchmark scores measure displayed skill on fixed tasks, not efficient learning under novelty. A position paper on ARC-AGI, commonsense evaluation, and what honest measurement would require.',
     tags: ['AI evaluation', 'position paper', 'ARC-AGI', 'commonsense reasoning'],
@@ -46,7 +48,7 @@ const POST_DEFS: PostDef[] = [
     slug: 'frontier-models-september-2026',
     title:
       'Frontier Language Models in September 2026: Truthfulness, Sycophancy, and Code Quality',
-    date: '2026-09-23',
+    publishedAt: '2026-09-22T23:09:21-04:00',
     description:
       'Snapshot: September 22, 2026. Gemini 3.8 Flash, Claude Sonnet 5, Muse Spark 1.3, and DeepSeek V4 Pro 0813 measured against truthfulness, presuppositional integrity, sycophancy, and forensic code quality. No model earns trust.',
     tags: ['AI evaluation', 'survey', 'LLMs', 'benchmarks'],
@@ -57,7 +59,7 @@ const POST_DEFS: PostDef[] = [
   {
     slug: 'who-predicts-well',
     title: 'Who Predicts Well, and Why: The Evidence on Expert Forecasting',
-    date: '2026-09-23',
+    publishedAt: '2026-09-23T22:43:59-04:00',
     description:
       'Peer-reviewed sources only. Foxes beat hedgehogs, tasks set the ceiling, institutions decide what gets heard — what the evidence says about expert forecasting.',
     tags: ['forecasting', 'expert judgment', 'survey'],
@@ -90,7 +92,7 @@ export function getPost(slug: string): PostMeta {
 
 export function getAllPosts(): PostMeta[] {
   return POST_DEFS.map(toMeta).sort((a, b) =>
-    a.date < b.date ? 1 : a.date > b.date ? -1 : 0,
+    a.publishedAt < b.publishedAt ? 1 : a.publishedAt > b.publishedAt ? -1 : 0,
   )
 }
 
@@ -116,7 +118,7 @@ export function loadPostContent(slug: string): Promise<MdxModule> {
 }
 
 export function formatPostDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', {
+  return new Date(iso).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

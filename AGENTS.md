@@ -84,8 +84,9 @@ OpenNext. Canonical origin: `https://paulpan.net`
 
 1. Add `src/content/posts/<slug>.mdx` (no frontmatter — metadata lives in
    `POST_DEFS` in `src/content/posts.ts`).
-2. Register it in `POST_DEFS` with title, date, tags, description,
-   reading-time estimate.
+2. Register it in `POST_DEFS` with title, `publishedAt` (full ISO 8601
+   go-live timestamp — never backdate to a draft's date), tags,
+   description, reading-time estimate.
 3. Figures: dependency-free SVG components in `src/components/<Name>/`
    (see `ArcAgiChart`). Every figure needs `<title>`/`<desc>`, a numbered
    `<figcaption>`, and must not overclaim the data (e.g. snapshots from
