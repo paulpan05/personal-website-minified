@@ -30,8 +30,9 @@ DB_ID=$(grep -oE 'database_id = "[0-9a-f-]+"' "$CREATE_LOG" | head -1 | cut -d'"
 if [ -z "${DB_ID:-}" ]; then
   echo "→ No id in create output; checking whether it already exists..."
   # Parse `wrangler d1 list` (avoids `d1 info`, which resolves the name
-  # through the placeholder id currently in wrangler.jsonc).
-  DB_ID=$(npx wrangler d1 list 2>/dev/null | awk -v name="$DB_NAME" '$1 == name { print $2 }' | head -1 || true)
+  # through the placeholder id currently in wrangler.jsonc; and note the
+  # list is a box-drawing table, so match the whole line, not fields).
+  DB_ID=$(npx wrangler d1 list 2>/dev/null | grep -F "$DB_NAME" | grep -oE '[0-9a-f-]{36}' | head -1 || true)
 fi
 rm -f "$CREATE_LOG"
 if [ -z "${DB_ID:-}" ]; then
