@@ -59,7 +59,10 @@ OpenNext. Canonical origin: `https://paulpan.net`
   (titles/tags/descriptions stay in `POST_DEFS`); `/api/search` returns
   slugs and the client joins metadata locally.
 - Schema: `migrations/0001_search.sql` (posts + porter-stemmed FTS5 +
-  sync triggers). Regenerate the seed after adding essays:
+  sync triggers). `cloudflare-env.d.ts` is force-tracked (generated, but
+  fresh clones need it for `D1Database` types) — regenerate with
+  `npm run cf-typegen` whenever bindings change and commit the result.
+  Regenerate the seed after adding essays:
   `node scripts/seed-search-db.mjs > d1/seed.sql`.
 - Local: `npx wrangler d1 execute DB --local --file=migrations/0001_search.sql`
   once, then `--file=d1/seed.sql` after each batch of posts. Verify under
