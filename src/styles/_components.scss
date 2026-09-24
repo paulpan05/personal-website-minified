@@ -95,6 +95,7 @@
 
   .site-links {
     display: flex;
+    align-items: center;
     gap: 1.25em;
     flex-wrap: wrap;
   }
@@ -105,6 +106,50 @@
   top: 0;
   z-index: 50;
   border-bottom: 2px solid $blog-hr;
+}
+
+.site-nav .site-links a {
+  // Comfortable pointer targets on desktop without growing the bar.
+  padding: 0.375em 0.25em;
+}
+
+// Hamburger toggle: nav-only (the footer shares .site-links styling but
+// never collapses). Hidden on desktop, revealed below.
+.site-nav .nav-toggle {
+  display: none;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 2px solid currentColor;
+  border-radius: 0.375em;
+  // Minimum 44px touch target.
+  padding: 0.5em 0.75em;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .site-nav .nav-toggle {
+    display: block;
+  }
+
+  .site-nav .site-links {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .site-nav .site-links.open {
+    display: flex;
+  }
+
+  .site-nav .site-links a {
+    // Full-width 44px+ rows while the menu is open.
+    padding: 0.75em 0.25em;
+    border-top: 1px solid $blog-hr;
+  }
 }
 
 .site-footer {
