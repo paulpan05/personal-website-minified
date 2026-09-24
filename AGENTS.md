@@ -58,4 +58,10 @@ OpenNext. Canonical origin: `https://paulpan.net`
    covered automatically), screenshot-check desktop + 390px widths using
    Playwright's bundled chromium — never the system-Chrome `--screenshot`
    CLI, which mis-scales viewports and produces false overflow alarms.
+   Capture full-page (`fullPage: true`) screenshots, not isolated viewports,
+   and scroll through the page step by step — viewport-only shots miss
+   section-level defects (e.g. white-on-paper cards halfway down).
    Commit + push.
+5. Restart any `next start` preview server after rebuilding: a running
+   server serves stale CSS/JS and produces misleading screenshots and
+   probes. Kill, rebuild, restart, then verify.
