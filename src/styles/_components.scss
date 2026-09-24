@@ -126,15 +126,23 @@
   }
 }
 
-// Shared Card Styles: terminal panels — paper surface, ink border.
+// Shared Card Styles: terminal panels — paper surface, ink border. Text and
+// links are pinned to ink/crimson so cards read the same on every section
+// background (sections default to white body text).
 .card {
   display: flex;
   flex-direction: column;
   border: 2px solid $ink;
   background-color: $paper;
+  color: $ink;
   padding: 1.25em;
   width: min(100%, 640px);
   box-sizing: border-box;
+
+  a,
+  a:visited {
+    color: $link-on-light;
+  }
 
   > * {
     align-self: center;
