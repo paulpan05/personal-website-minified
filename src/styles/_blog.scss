@@ -68,7 +68,7 @@
   }
 }
 
-// Search + topic filter. The full-text index lazy-loads on first keystroke;
+// Search + topic facets. Facets and hits load from the D1-backed APIs;
 // the default list stays server-rendered for SEO and no-JS readers.
 .blog-search {
   margin-top: 1.5em;
@@ -117,6 +117,27 @@
 .tag-chip[aria-pressed='true'] {
   color: $link-on-dark;
   border-color: $link-on-dark;
+}
+
+.tag-count {
+  color: $blog-muted;
+}
+
+.tag-chip[aria-pressed='true'] .tag-count {
+  color: inherit;
+}
+
+.clear-filters {
+  font-family: $font-display;
+  font-size: 0.875rem;
+  color: $link-on-dark;
+  background: none;
+  border: none;
+  padding: 0.375em 0.25em;
+  margin-top: 1em;
+  // 44px+ touch target.
+  min-height: 44px;
+  cursor: pointer;
 }
 
 .search-meta {

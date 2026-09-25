@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { getAllPosts } from '@/content/posts'
 import type { PostMeta } from '@/content/posts'
 import { SITE_NAME } from '@/lib/site'
@@ -25,7 +26,9 @@ function groupByYear(posts: PostMeta[]): Array<[string, PostMeta[]]> {
 }
 
 // Unfiltered archive pages stay small as the collection grows: 20 essays
-// per page. Filtered/search views (client-side) show matches uncapped.
+// per page. Filtered views are client-side: text search shows the top 20
+// hits by bm25, tag-only browsing pages through /api/posts. Filter state
+// lives in the URL, so BlogSearch reads useSearchParams and needs Suspense.
 const PAGE_SIZE = 20
 
 export default async function BlogIndex({
@@ -48,8 +51,9 @@ export default async function BlogIndex({
         {posts.length === 0 ? (
           <p>No posts yet.</p>
         ) : (
-          <BlogSearch>
-            {groupByYear(pagePosts).map(([year, yearPosts]) => (
+          <Suspense>
+            <BlogSearch>
+              {groupByYear(pagePosts).map(([year, yearPosts]) => (
               <section
                 key={year}
                 className="blog-year"
@@ -77,8 +81,9 @@ export default async function BlogIndex({
                   <a href={`/blog?page=${page + 1}`}>Older →</a>
                 )}
               </nav>
-            )}
-          </BlogSearch>
+              )}
+            </BlogSearch>
+          </Suspense>
         )}
       </main>
     </div>

@@ -96,13 +96,37 @@ test("listing tag filter narrows", async () => {
 	expect(body.posts[0].slug).toBe("who-predicts-well");
 });
 
-test("tags enumerate distinct topics", async () => {
-	const { body } = await get<{ tags: string[]; source?: string }>(
-		"/api/tags",
-	);
+test("tags enumerate topics with counts", async () => {
+	const { body } = await get<{
+		tags: { tag: string; count: number }[];
+		source?: string;
+	}>("/api/tags");
 	expect(body.source).toBe("d1");
-	expect(body.tags).toContain("forecasting");
-	expect(body.tags).toEqual([...body.tags].sort());
+	const names = body.tags.map((t) => t.tag);
+	expect(names).toContain("forecasting");
+	expect(names).toEqual([...names].sort());
+	expect(
+		body.tags.find((t) => t.tag === "forecasting")?.count,
+	).toBeGreaterThanOrEqual(1);
+});
+
+test("multi-tag listing is OR", async () => {
+	const { body } = await get<{ posts: ApiPost[]; total: number }>(
+		"/api/posts?tag=forecasting&tag=survey",
+	);
+	const slugs = body.posts.map((p) => p.slug);
+	expect(slugs).toContain("who-predicts-well");
+	expect(slugs).toContain("frontier-models-september-2026");
+	expect(body.total).toBeGreaterThanOrEqual(2);
+});
+
+test("multi-tag search is OR within the facet", async () => {
+	const { body } = await get<{ posts: ApiPost[] }>(
+		"/api/search?q=intelligence&tag=survey&tag=ARC-AGI",
+	);
+	const slugs = body.posts.map((p) => p.slug);
+	expect(slugs).toContain("frontier-models-september-2026");
+	expect(slugs).toContain("benchmark-intelligence-gap");
 });
 
 test("nonsense query returns empty, not an error", async () => {

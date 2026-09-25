@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { PostMeta } from '@/content/posts'
 import BlogEntry from '@/components/BlogEntry/BlogEntry'
 
@@ -14,6 +15,13 @@ interface ApiPostRow {
   reading_minutes: number
   provenance: string
 }
+
+interface TagFacet {
+  tag: string
+  count: number
+}
+
+const SEARCH_LIMIT = 20
 
 function toMeta(row: ApiPostRow): PostMeta {
   return {
@@ -41,38 +49,56 @@ async function fetchJson<T>(url: string): Promise<T> {
   }
 }
 
+function facetParams(query: string, tags: string[]): URLSearchParams {
+  const params = new URLSearchParams()
+  if (query !== '') {
+    params.set('q', query)
+  }
+  for (const tag of tags) {
+    params.append('tag', tag)
+  }
+  return params
+}
+
 /**
- * Archive browser. Reads listing metadata, tags, and search hits from the
- * D1-backed API routes — the client never holds more than one page of
- * posts, at any archive size. The server-rendered first page (children)
- * stays as the SEO/no-JS baseline and the inactive view.
+ * Archive browser: commerce-style facets (multi-select topics with counts,
+ * clear-all) plus full-text search. Reads listing metadata, facets, and
+ * search hits from the D1-backed API routes — the client never holds more
+ * than one page of posts, at any archive size. Tag filtering is OR within
+ * the facet; a text query ANDs across it. Text search returns the top
+ * SEARCH_LIMIT hits by bm25; tag-only browsing pages through /api/posts.
+ * Filter state lives in the URL (?q= + repeated ?tag=) so filtered views
+ * are shareable; the server-rendered first page (children) stays as the
+ * SEO/no-JS baseline and the inactive view.
  */
 export default function BlogSearch({
   children,
 }: {
   children: ReactNode
 }) {
-  const [query, setQuery] = useState('')
-  const [activeTag, setActiveTag] = useState<string | null>(null)
-  const [tags, setTags] = useState<string[] | null>(null)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '')
+  const [activeTags, setActiveTags] = useState<string[]>(() =>
+    searchParams.getAll('tag').filter((t) => t !== ''),
+  )
+  const [tags, setTags] = useState<TagFacet[] | null>(null)
   const [results, setResults] = useState<PostMeta[] | null>(null)
   const [resultPage, setResultPage] = useState({ page: 1, totalPages: 1 })
   const [resultMeta, setResultMeta] = useState('')
   const [unavailable, setUnavailable] = useState(false)
 
   const trimmed = query.trim()
-  const filtering = trimmed !== '' || activeTag !== null
+  const filtering = trimmed !== '' || activeTags.length > 0
 
-  // Topic chips, fetched once. Hidden (not faked) if the API is down.
+  // Topic facets with counts, fetched once. Hidden (not faked) if down.
   useEffect(() => {
-    fetchJson<{ tags: string[] }>('/api/tags')
+    fetchJson<{ tags: TagFacet[] }>('/api/tags')
       .then((data) => setTags(data.tags))
       .catch(() => setTags([]))
   }, [])
 
-  // Debounced search/listing fetch. Tag-only browsing pages through
-  // /api/posts; text queries go to /api/search (D1 FTS5, title/tag
-  // re-boosted client-side over the bm25 order it returns).
+  // Debounced search/listing fetch; filter state mirrors into the URL.
   useEffect(() => {
     if (!filtering) {
       setResults(null)
@@ -81,25 +107,26 @@ export default function BlogSearch({
     }
     let cancelled = false
     const timer = setTimeout(() => {
+      router.replace(`/blog?${facetParams(trimmed, activeTags)}`, {
+        scroll: false,
+      })
       const run = async () => {
         try {
           if (trimmed !== '') {
-            const params = new URLSearchParams({ q: trimmed })
-            if (activeTag) {
-              params.set('tag', activeTag)
-            }
             const data = await fetchJson<{
               posts: ApiPostRow[]
-            }>(`/api/search?${params}`)
+            }>(`/api/search?${facetParams(trimmed, activeTags)}`)
             if (cancelled) {
               return
             }
             const ranked = data.posts.map(toMeta)
             setResults(ranked)
             setResultPage({ page: 1, totalPages: 1 })
-            const parts = [`${ranked.length} essay${ranked.length === 1 ? '' : 's'} matching “${trimmed}”`]
-            if (activeTag) {
-              parts.push(`in “${activeTag}”`)
+            const parts = [
+              `${ranked.length} of up to ${SEARCH_LIMIT} essays matching “${trimmed}”`,
+            ]
+            if (activeTags.length > 0) {
+              parts.push(`in ${activeTags.map((t) => `“${t}”`).join(', ')}`)
             }
             setResultMeta(parts.join(' '))
           } else {
@@ -108,14 +135,14 @@ export default function BlogSearch({
               page: number
               totalPages: number
               total: number
-            }>(`/api/posts?tag=${encodeURIComponent(activeTag ?? '')}&page=1`)
+            }>(`/api/posts?${facetParams('', activeTags)}&page=1`)
             if (cancelled) {
               return
             }
             setResults(data.posts.map(toMeta))
             setResultPage({ page: data.page, totalPages: data.totalPages })
             setResultMeta(
-              `${data.total} essay${data.total === 1 ? '' : 's'} in “${activeTag}”`,
+              `${data.total} essay${data.total === 1 ? '' : 's'} in ${activeTags.map((t) => `“${t}”`).join(', ')}`,
             )
           }
           setUnavailable(false)
@@ -131,7 +158,8 @@ export default function BlogSearch({
       cancelled = true
       clearTimeout(timer)
     }
-  }, [query, activeTag, filtering, trimmed])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, activeTags, filtering, trimmed])
 
   const turnTagPage = (direction: 1 | -1) => {
     const next = resultPage.page + direction
@@ -139,7 +167,7 @@ export default function BlogSearch({
       posts: ApiPostRow[]
       page: number
       totalPages: number
-    }>(`/api/posts?tag=${encodeURIComponent(activeTag ?? '')}&page=${next}`)
+    }>(`/api/posts?${facetParams('', activeTags)}&page=${next}`)
       .then((data) => {
         setResults(data.posts.map(toMeta))
         setResultPage({ page: data.page, totalPages: data.totalPages })
@@ -148,7 +176,19 @@ export default function BlogSearch({
       .catch(() => setUnavailable(true))
   }
 
-  const chips = useMemo(() => tags ?? [], [tags])
+  const toggleTag = (tag: string) => {
+    setActiveTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    )
+  }
+
+  const clearFilters = () => {
+    setQuery('')
+    setActiveTags([])
+    router.replace('/blog', { scroll: false })
+  }
+
+  const facets = useMemo(() => tags ?? [], [tags])
 
   return (
     <div className="blog-search">
@@ -163,20 +203,25 @@ export default function BlogSearch({
           onChange={(event) => setQuery(event.target.value)}
         />
       </label>
-      {chips.length > 0 && (
+      {facets.length > 0 && (
         <div className="tag-chips" role="group" aria-label="Filter by topic">
-          {chips.map((tag) => (
+          {facets.map(({ tag, count }) => (
             <button
               key={tag}
               type="button"
               className="tag-chip"
-              aria-pressed={activeTag === tag}
-              onClick={() => setActiveTag((prev) => (prev === tag ? null : tag))}
+              aria-pressed={activeTags.includes(tag)}
+              onClick={() => toggleTag(tag)}
             >
-              {tag}
+              {tag} <span className="tag-count">({count})</span>
             </button>
           ))}
         </div>
+      )}
+      {filtering && (
+        <button type="button" className="clear-filters" onClick={clearFilters}>
+          Clear filters
+        </button>
       )}
       {results === null && !unavailable ? (
         children
@@ -190,7 +235,10 @@ export default function BlogSearch({
           ) : results !== null && results.length === 0 ? (
             <p className="search-meta">
               No essays match{trimmed !== '' ? ` “${trimmed}”` : ''}
-              {activeTag ? ` in “${activeTag}”` : ''}.
+              {activeTags.length > 0
+                ? ` in ${activeTags.map((t) => `“${t}”`).join(', ')}`
+                : ''}
+              .
             </p>
           ) : (
             results !== null && (

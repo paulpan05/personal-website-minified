@@ -29,18 +29,15 @@ function toMatchExpression(query: string): string | null {
   return tokens.map((token) => `"${token}"*`).join(' AND ')
 }
 
-function tagPredicate(tag: string | null): { clause: string; value: string } {
-  // Tags are stored as a JSON array string; matching the quoted form avoids
-  // substring false positives ("AI" must not match "said").
-  return tag
-    ? { clause: 'AND p.tags LIKE ?2', value: `%"${tag}"%` }
-    : { clause: '', value: '' }
-}
-
 export async function GET(request: Request): Promise<Response> {
   const params = new URL(request.url).searchParams
   const query = params.get('q')?.trim() ?? ''
-  const tag = params.get('tag')?.trim() || null
+  // Repeated ?tag= narrows to essays carrying ANY tag (OR within the
+  // facet — the commerce convention; the text query ANDs across it).
+  const tags = params
+    .getAll('tag')
+    .map((t) => t.trim())
+    .filter((t) => t !== '')
   const match = toMatchExpression(query)
   if (!match) {
     return Response.json({ posts: [] })
@@ -56,9 +53,12 @@ export async function GET(request: Request): Promise<Response> {
   }
   try {
     // Parameter numbering must stay dense (?1..?N with no gaps), so the
-    // LIMIT placeholder shifts depending on whether the tag clause exists.
-    const { clause, value } = tagPredicate(tag)
-    const limitParam = tag ? '?3' : '?2'
+    // LIMIT placeholder shifts with the tag count.
+    const tagLikes = tags
+      .map((_, i) => `p.tags LIKE ?${i + 2}`)
+      .join(' OR ')
+    const clause = tags.length === 0 ? '' : `AND (${tagLikes})`
+    const limitParam = `?${tags.length + 2}`
     const stmt = db.prepare(
       // NOTE: FTS5 MATCH requires the table name, not an alias (D1 rejects
       // `f MATCH`). bm25() likewise takes the table name.
@@ -67,9 +67,11 @@ export async function GET(request: Request): Promise<Response> {
        WHERE posts_fts MATCH ?1 ${clause}
        ORDER BY bm25(posts_fts) LIMIT ${limitParam}`,
     )
-    const bound = tag
-      ? stmt.bind(match, value, MAX_RESULTS)
-      : stmt.bind(match, MAX_RESULTS)
+    const bound = stmt.bind(
+      match,
+      ...tags.map((t) => `%"${t}"%`),
+      MAX_RESULTS,
+    )
     const { results } = await bound.all<SearchRow>()
     return Response.json({ posts: results, source: 'd1-fts5' })
   } catch {

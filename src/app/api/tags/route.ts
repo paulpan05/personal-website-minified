@@ -2,8 +2,9 @@ import { getCloudflareContext } from '@opennextjs/cloudflare'
 
 export const dynamic = 'force-dynamic'
 
-/** Distinct topic tags across the archive, alphabetical. Powers the filter
- *  chips without bundling every post's metadata into the client. */
+/** Topic tags across the archive with per-topic essay counts, alphabetical.
+ *  Powers the multi-select filter facets (commerce-style: checkbox/chip +
+ *  count) without bundling every post's metadata into the client. */
 export async function GET(): Promise<Response> {
   let db: D1Database
   try {
@@ -17,11 +18,11 @@ export async function GET(): Promise<Response> {
   try {
     const { results } = await db
       .prepare(
-        `SELECT DISTINCT value AS tag FROM posts, json_each(posts.tags) ORDER BY tag`,
+        `SELECT value AS tag, count(*) AS count FROM posts, json_each(posts.tags) GROUP BY value ORDER BY tag`,
       )
-      .all<{ tag: string }>()
+      .all<{ tag: string; count: number }>()
     return Response.json({
-      tags: results.map((row) => row.tag),
+      tags: results,
       source: 'd1',
     })
   } catch {
