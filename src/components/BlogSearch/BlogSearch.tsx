@@ -22,6 +22,9 @@ interface TagFacet {
 }
 
 const SEARCH_LIMIT = 20
+// Topics shown before "show more" — keeps the panel bounded when the
+// vocabulary grows with the archive (hundreds of topics at 10k essays).
+const INITIAL_FACETS = 10
 
 function toMeta(row: ApiPostRow): PostMeta {
   return {
@@ -61,8 +64,10 @@ function facetParams(query: string, tags: string[]): URLSearchParams {
 }
 
 /**
- * Archive browser: commerce-style facets (multi-select topics with counts,
- * clear-all) plus full-text search. Reads listing metadata, facets, and
+ * Archive browser: commerce-style filter — a toggle button with an
+ * active-count badge expanding a facet panel (multi-select topic
+ * checkboxes with counts, show more/less past INITIAL_FACETS, clear-all,
+ * done) — plus full-text search. Reads listing metadata, facets, and
  * search hits from the D1-backed API routes — the client never holds more
  * than one page of posts, at any archive size. Tag filtering is OR within
  * the facet; a text query ANDs across it. Text search returns the top
@@ -87,6 +92,8 @@ export default function BlogSearch({
   const [resultPage, setResultPage] = useState({ page: 1, totalPages: 1 })
   const [resultMeta, setResultMeta] = useState('')
   const [unavailable, setUnavailable] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(false)
+  const [showAllFacets, setShowAllFacets] = useState(false)
 
   const trimmed = query.trim()
   const filtering = trimmed !== '' || activeTags.length > 0
@@ -189,6 +196,8 @@ export default function BlogSearch({
   }
 
   const facets = useMemo(() => tags ?? [], [tags])
+  const visibleFacets = showAllFacets ? facets : facets.slice(0, INITIAL_FACETS)
+  const activeCount = activeTags.length + (trimmed !== '' ? 1 : 0)
 
   return (
     <div className="blog-search">
@@ -204,24 +213,75 @@ export default function BlogSearch({
         />
       </label>
       {facets.length > 0 && (
-        <div className="tag-chips" role="group" aria-label="Filter by topic">
-          {facets.map(({ tag, count }) => (
-            <button
-              key={tag}
-              type="button"
-              className="tag-chip"
-              aria-pressed={activeTags.includes(tag)}
-              onClick={() => toggleTag(tag)}
+        <div className="filter-wrap">
+          <button
+            type="button"
+            className="filter-toggle"
+            aria-expanded={panelOpen}
+            aria-controls="blog-filter-panel"
+            onClick={() => setPanelOpen((open) => !open)}
+          >
+            <span aria-hidden="true">{panelOpen ? '▾' : '▸'}</span> Filters
+            {activeCount > 0 && (
+              <span className="filter-badge">{activeCount}</span>
+            )}
+          </button>
+          {panelOpen && (
+            <section
+              id="blog-filter-panel"
+              className="filter-panel"
+              aria-label="Essay filters"
             >
-              {tag} <span className="tag-count">({count})</span>
-            </button>
-          ))}
+              <fieldset className="filter-group">
+                <legend>Topics</legend>
+                <ul className="filter-options">
+                  {visibleFacets.map(({ tag, count }) => (
+                    <li key={tag}>
+                      <label className="filter-option">
+                        <input
+                          type="checkbox"
+                          checked={activeTags.includes(tag)}
+                          onChange={() => toggleTag(tag)}
+                        />
+                        <span className="filter-option-label">{tag}</span>
+                        <span className="tag-count">({count})</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+                {facets.length > INITIAL_FACETS && (
+                  <button
+                    type="button"
+                    className="filter-more"
+                    onClick={() => setShowAllFacets((show) => !show)}
+                  >
+                    {showAllFacets
+                      ? 'Show fewer topics'
+                      : `Show all ${facets.length} topics`}
+                  </button>
+                )}
+              </fieldset>
+              <div className="filter-actions">
+                {filtering && (
+                  <button
+                    type="button"
+                    className="clear-filters"
+                    onClick={clearFilters}
+                  >
+                    Clear all
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="filter-done"
+                  onClick={() => setPanelOpen(false)}
+                >
+                  Done
+                </button>
+              </div>
+            </section>
+          )}
         </div>
-      )}
-      {filtering && (
-        <button type="button" className="clear-filters" onClick={clearFilters}>
-          Clear filters
-        </button>
       )}
       {results === null && !unavailable ? (
         children

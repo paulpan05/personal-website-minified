@@ -95,36 +95,118 @@
   }
 }
 
-.tag-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em;
+// Commerce-style filter: a toggle button with an active-count badge that
+// expands a facet panel (checkbox rows + counts). The panel bounds a large
+// topic vocabulary: scrollable list, show more/less past INITIAL_FACETS.
+.filter-wrap {
   margin-top: 1em;
 }
 
-.tag-chip {
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   font-family: $font-display;
   font-size: 0.875rem;
   color: $blog-ink;
   background: none;
   border: 1px solid $blog-table-border;
-  border-radius: 999px;
+  border-radius: 0.375em;
   padding: 0.5em 1em;
+  // 44px+ touch target.
   min-height: 44px;
   cursor: pointer;
 }
 
-.tag-chip[aria-pressed='true'] {
-  color: $link-on-dark;
-  border-color: $link-on-dark;
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: $blog-pre-bg;
+  background-color: $link-on-dark;
+}
+
+.filter-panel {
+  margin-top: 0.75em;
+  border: 1px solid $blog-table-border;
+  border-radius: 0.375em;
+  padding: 1em 1.25em;
+  max-width: 70ch;
+}
+
+.filter-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  legend {
+    font-family: $font-display;
+    font-size: 0.875rem;
+    color: $blog-muted;
+    padding: 0;
+    margin-bottom: 0.5em;
+  }
+}
+
+.filter-options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  // Bounded at any vocabulary size.
+  max-height: 16em;
+  overflow-y: auto;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.625em;
+  font-family: $font-display;
+  font-size: 0.875rem;
+  color: $blog-ink;
+  padding: 0.375em 0.25em;
+  // 44px+ touch target.
+  min-height: 44px;
+  cursor: pointer;
+
+  input {
+    width: 1.125em;
+    height: 1.125em;
+    accent-color: $link-on-dark;
+  }
+}
+
+.filter-option-label {
+  flex: 1 1 auto;
 }
 
 .tag-count {
   color: $blog-muted;
 }
 
-.tag-chip[aria-pressed='true'] .tag-count {
-  color: inherit;
+.filter-more {
+  font-family: $font-display;
+  font-size: 0.875rem;
+  color: $link-on-dark;
+  background: none;
+  border: none;
+  padding: 0.375em 0.25em;
+  margin-top: 0.5em;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 1.5em;
+  align-items: baseline;
+  margin-top: 1em;
+  padding-top: 1em;
+  border-top: 1px solid $blog-table-border;
 }
 
 .clear-filters {
@@ -134,8 +216,18 @@
   background: none;
   border: none;
   padding: 0.375em 0.25em;
-  margin-top: 1em;
-  // 44px+ touch target.
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.filter-done {
+  font-family: $font-display;
+  font-size: 0.875rem;
+  color: $blog-ink;
+  background: none;
+  border: 1px solid $blog-table-border;
+  border-radius: 0.375em;
+  padding: 0.5em 1.25em;
   min-height: 44px;
   cursor: pointer;
 }

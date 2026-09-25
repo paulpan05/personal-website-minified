@@ -129,6 +129,26 @@ test("multi-tag search is OR within the facet", async () => {
 	expect(slugs).toContain("benchmark-intelligence-gap");
 });
 
+test("filter panel toggles a topic into the URL and narrows", async ({
+	page,
+}) => {
+	await page.goto(`${BASE}/blog`);
+	await page.getByRole("button", { name: /Filters/ }).click();
+	await page.getByRole("checkbox", { name: /survey/ }).check();
+	await expect(page).toHaveURL(/tag=survey/);
+	await expect(page.getByText(/essays? in “survey”/)).toBeVisible();
+	await expect(page.getByRole("button", { name: /Filters/ })).toContainText(
+		"1",
+	);
+});
+
+test("clear-all resets filters and URL", async ({ page }) => {
+	await page.goto(`${BASE}/blog?tag=survey`);
+	await page.getByRole("button", { name: /Filters/ }).click();
+	await page.getByRole("button", { name: /Clear all/ }).click();
+	await expect(page).toHaveURL(`${BASE}/blog`);
+	await expect(page.getByText(/essays? in “survey”/)).toBeHidden();
+});
 test("nonsense query returns empty, not an error", async () => {
 	const { status, body } = await get<{ posts: ApiPost[] }>(
 		"/api/search?q=zzzznonexistent",

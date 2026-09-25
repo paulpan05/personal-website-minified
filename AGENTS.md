@@ -104,8 +104,11 @@ OpenNext. Canonical origin: `https://paulpan.net`
   it fails but smoke passes, prod has no database — check
   migrations/seeding. Dashboard Workers + D1 analytics corroborate.
 - Index page: 20 essays per page (`?page=N`), year subheads per page,
-  commerce-style facets (multi-select topic chips with per-topic counts,
-  OR within the facet, clear-all) + search box (FTS5 bm25 ranking over
+  commerce-style filter (a Filters toggle with an active-count badge
+  expanding a facet panel: multi-select topic checkboxes with per-topic
+  counts, OR within the facet, clear-all + done; the option list
+  scrolls and collapses past INITIAL_FACETS so a 10k-essay vocabulary
+  stays bounded) + search box (FTS5 bm25 ranking over
   quoted per-token prefix matches, all tokens ANDed; tokens must be ≥2
   chars, max 8 per query; top 20 hits). Tag-only browsing pages through
   `/api/posts`; `/api/tags` returns `{tag, count}` rows. Filter state
