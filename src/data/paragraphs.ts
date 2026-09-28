@@ -1,4 +1,4 @@
-export const aboutMeText = `I currently live in the New York City metropolitan area, and I am working as a software engineer at Meta's Reality Labs. I am experienced with building and debugging iOS and Android applications at work (including Android system apps). I have also developed full-stack web applications with Node.js, React, and Next.js. Outside of work I ship iOS apps — most recently BibleDevos, a scripture-linked study-notes app on the App Store — and explore hardware-agnostic GPU compute in C++ and CUDA.`;
+export const aboutMeText = `I am a Senior Software Engineer at Meta in the Applied AI org, based in the New York City metropolitan area. Before that I worked on Mobile GraphQL Infra and spent three years in Reality Labs across Devices, the Companion app, and the Meta AI app platform. I hold a B.S. in Computer Science from UC San Diego (2022). Outside of work I ship iOS apps — most recently BibleDevos, a scripture-linked study-notes app on the App Store — and explore hardware-agnostic GPU compute in C++ and CUDA.`;
 
 export const aboutThisSiteText = `This website is developed with Next.js and deployed to Cloudflare Workers.`;
 
