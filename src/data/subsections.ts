@@ -38,20 +38,28 @@ export const experienceCards: ExperienceCard[] = [
 
 export const highlightedProjectsCards: HighlightedProjectCard[] = [
   {
-    shortDescription: "numvk and numgpu",
-    mediumDescription: "Two parallel computing libraries meant to be hardware agnostic (numvk written using only Vulkan and numgpu written using CUDA, Metal, and Vulkan Kompute)",
-    longDescription: "This project is designed as a GPU alternative to the popular Python library numpy. The CUDA implementation uses kernels to run code on the GPU while the Metal and Vulkan implementations use MSL and GLSL shading languages to perform similar actions. The build automation system used here is CMake (which detects which build files to generate depending on the SDKs available and the operating system).",
+    shortDescription: "BibleDevos",
+    mediumDescription:
+      "Shipped iOS/iPad app for scripture-linked study notes with real-time group collaboration and offline-first reading",
+    longDescription:
+      "Notes stay anchored to the passages that inspired them: single verses, ranges, and cross-chapter references that open the full text in context. Notes can be shared privately with users or study groups, discussed through real-time comments, or published publicly for discovery. The app ships a built-in KJV/ASV reader, caches content for offline use, and signs in with email, Google, or Apple. Live on the App Store with a companion website.",
     links: [
-      { label: "numvk", url: "https://gitlab.com/paulpan05/vulkan-numeric-libraries" },
-      { label: "numgpu", url: "https://gitlab.com/paulpan05/gpu-compute-libraries" },
+      { label: "website", url: "https://bibledevos.com/" },
+      {
+        label: "App Store",
+        url: "https://apps.apple.com/us/app/bibledevos/id6759275734",
+      },
     ],
   },
   {
-    shortDescription: "mlp-theano",
-    mediumDescription: "Implementation of multi-layer perceptron using Theano, a popular Python tensor library used in ML research.",
-    longDescription: "This project implements the multilayer perceptron uses the library Theano. The purpose of this is to allow for GPU offloading of matrix operations, which speeds up training compared to numpy as well as being more simple to implement / maintain when compared to using libraries like PyTorch and Tensorflow.",
+    shortDescription: "numvk and numgpu",
+    mediumDescription:
+      "Explorations in hardware-agnostic GPU compute: a Vulkan device bootstrap plus one element-wise kernel across CUDA and HIP backends",
+    longDescription:
+      "Two related experiments, both early-stage. numvk implements Vulkan instance, physical-device, logical-device, and command-pool setup with a single GLSL power shader and a shader-loading test. numgpu implements vector power across CUDA and HIP, with the Metal and Vulkan/Kompute backends still stubs. CMake build with shader compilation and Catch2 tests.",
     links: [
-      { label: "mlp-theano", url: "https://github.com/paulpan05/mlp-theano" },
+      { label: "numvk", url: "https://gitlab.com/paulpan05/vulkan-numeric-libraries" },
+      { label: "numgpu", url: "https://gitlab.com/paulpan05/gpu-compute-libraries" },
     ],
   },
 ];
