@@ -40,11 +40,11 @@ export const highlightedProjectsCards: HighlightedProjectCard[] = [
   {
     shortDescription: "BibleDevos",
     mediumDescription:
-      "Shipped iOS/iPad app for scripture-linked study notes with real-time group collaboration and offline-first reading",
+      "Shipped scripture-linked study-notes app on web and iOS, with real-time group collaboration and offline-first reading (Android in closed testing)",
     longDescription:
-      "Notes stay anchored to the passages that inspired them: single verses, ranges, and cross-chapter references that open the full text in context. Notes can be shared privately with users or study groups, discussed through real-time comments, or published publicly for discovery. The app ships a built-in KJV/ASV reader, caches content for offline use, and signs in with email, Google, or Apple. Live on the App Store with a companion website.",
+      "Notes stay anchored to the passages that inspired them: single verses, ranges, and cross-chapter references that open the full text in context. Notes can be shared privately with users or study groups, discussed through real-time comments, or published publicly for discovery. The app ships a built-in KJV/ASV reader, caches content for offline use, and signs in with email, Google, or Apple. The same product ships as a web app and a native iOS app; the Android build is in closed testing (Play approval pending the 12-tester requirement).",
     links: [
-      { label: "website", url: "https://bibledevos.com/" },
+      { label: "web app", url: "https://bibledevos.com/" },
       {
         label: "App Store",
         url: "https://apps.apple.com/us/app/bibledevos/id6759275734",
@@ -60,6 +60,18 @@ export const highlightedProjectsCards: HighlightedProjectCard[] = [
     links: [
       { label: "numvk", url: "https://gitlab.com/paulpan05/vulkan-numeric-libraries" },
       { label: "numgpu", url: "https://gitlab.com/paulpan05/gpu-compute-libraries" },
+    ],
+  },
+  {
+    shortDescription: "Hackathon wins",
+    mediumDescription:
+      "Two winner-ribbon builds on Devpost: SideTrack and Platypus, plus iConfession and Easy Tour across four hackathons",
+    longDescription:
+      "SideTrack — optimized pothole detection through user collaboration (Winner). Platypus — a browser companion surfacing CVEs and vulnerabilities of the sites being visited (Winner). Also built iConfession and Easy Tour.",
+    links: [
+      { label: "Devpost profile", url: "https://devpost.com/paulpan05" },
+      { label: "SideTrack", url: "https://devpost.com/software/sidetrack" },
+      { label: "Platypus", url: "https://devpost.com/software/slo-hacks-2020" },
     ],
   },
 ];
