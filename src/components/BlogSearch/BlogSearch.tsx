@@ -228,7 +228,9 @@ export default function BlogSearch({
 
   const facets = useMemo(() => tags ?? [], [tags])
   const visibleFacets = showAllFacets ? facets : facets.slice(0, INITIAL_FACETS)
-  const activeCount = activeTags.length + (trimmed !== '' ? 1 : 0)
+  // Badge counts checked topics only: the search text is already visible
+  // in the input, so counting it here would imply a topic is selected.
+  const activeCount = activeTags.length
 
   return (
     <div className="blog-search">
