@@ -59,7 +59,18 @@ for (const def of POST_DEFS) {
       `'${escapeLiteral(JSON.stringify(meta.tags))}', ` +
       `${meta.readingMinutes}, ` +
       `'${escapeLiteral(meta.provenance)}', ` +
-      `'${escapeLiteral(body)}');`,
+      `'${escapeLiteral(body)}');\n` +
+      // Junction rows, derived from the same registry tags the JSON
+      // column carries. OR IGNORE: the posts_tags_ai trigger may already
+      // have inserted these on the posts INSERT above — either path (or
+      // both) lands exactly one row each.
+      `DELETE FROM post_tags WHERE post_slug = '${escapeLiteral(meta.slug)}';\n` +
+      meta.tags
+        .map(
+          (tag) =>
+            `INSERT OR IGNORE INTO post_tags (post_slug, tag) VALUES ('${escapeLiteral(meta.slug)}', '${escapeLiteral(tag)}');`,
+        )
+        .join('\n'),
   )
 }
 

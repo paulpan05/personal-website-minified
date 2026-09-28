@@ -40,18 +40,22 @@ export async function GET(request: Request): Promise<Response> {
     )
   }
   try {
-    // One LIKE per tag, ORed; tags match the quoted JSON form so "AI"
-    // never matches "said". Parameter numbering stays dense (?1..?N).
-    const tagLikes = tags.map((_, i) => `tags LIKE ?${i + 1}`).join(' OR ')
-    const tagValues = tags.map((t) => `%"${t}"%`)
+    // Indexed equality on the junction table (no LIKE scans): a post
+    // matches when ANY tag hits (OR within the facet). Parameter
+    // numbering stays dense (?1..?N).
+    const tagIn = tags.map((_, i) => `?${i + 1}`).join(', ')
+    const tagExists = (alias: string): string =>
+      tags.length === 0
+        ? ''
+        : `WHERE EXISTS (SELECT 1 FROM post_tags WHERE post_tags.post_slug = ${alias}.slug AND post_tags.tag IN (${tagIn}))`
     const countResult =
       tags.length === 0
         ? await db
             .prepare('SELECT count(*) AS total FROM posts')
             .first<{ total: number }>()
         : await db
-            .prepare(`SELECT count(*) AS total FROM posts WHERE ${tagLikes}`)
-            .bind(...tagValues)
+            .prepare(`SELECT count(*) AS total FROM posts ${tagExists('posts')}`)
+            .bind(...tags)
             .first<{ total: number }>()
     const total = countResult?.total ?? 0
     const totalPages = Math.max(1, Math.ceil(total / per))
@@ -70,9 +74,9 @@ export async function GET(request: Request): Promise<Response> {
             .all<PostRow>()
         : await db
             .prepare(
-              `SELECT ${fields} FROM posts WHERE ${tagLikes} ORDER BY published_at DESC LIMIT ?${tags.length + 1} OFFSET ?${tags.length + 2}`,
+              `SELECT ${fields} FROM posts ${tagExists('posts')} ORDER BY published_at DESC LIMIT ?${tags.length + 1} OFFSET ?${tags.length + 2}`,
             )
-            .bind(...tagValues, per, offset)
+            .bind(...tags, per, offset)
             .all<PostRow>()
     return Response.json({
       posts: results,

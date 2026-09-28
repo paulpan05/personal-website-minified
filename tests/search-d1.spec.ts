@@ -120,6 +120,31 @@ test("multi-tag listing is OR", async () => {
 	expect(body.total).toBeGreaterThanOrEqual(2);
 });
 
+test("search paginates: per=1 pages through distinct results", async () => {
+	const page1 = await get<{
+		posts: ApiPost[];
+		total: number;
+		page: number;
+		totalPages: number;
+	}>("/api/search?q=intelligence&per=1&page=1");
+	expect(page1.body.total).toBeGreaterThanOrEqual(2);
+	expect(page1.body.totalPages).toBeGreaterThanOrEqual(2);
+	expect(page1.body.posts).toHaveLength(1);
+
+	const page2 = await get<{ posts: ApiPost[]; page: number }>(
+		"/api/search?q=intelligence&per=1&page=2",
+	);
+	expect(page2.body.page).toBe(2);
+	expect(page2.body.posts[0].slug).not.toBe(page1.body.posts[0].slug);
+});
+
+test("search page beyond the end clamps to the last page", async () => {
+	const { body } = await get<{ page: number; totalPages: number }>(
+		"/api/search?q=intelligence&per=1&page=999",
+	);
+	expect(body.page).toBe(body.totalPages);
+});
+
 test("multi-tag search is OR within the facet", async () => {
 	const { body } = await get<{ posts: ApiPost[] }>(
 		"/api/search?q=intelligence&tag=survey&tag=ARC-AGI",

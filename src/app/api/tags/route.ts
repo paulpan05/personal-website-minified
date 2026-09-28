@@ -18,7 +18,7 @@ export async function GET(): Promise<Response> {
   try {
     const { results } = await db
       .prepare(
-        `SELECT value AS tag, count(*) AS count FROM posts, json_each(posts.tags) GROUP BY value ORDER BY tag`,
+        `SELECT tag, count(*) AS count FROM post_tags GROUP BY tag ORDER BY tag`,
       )
       .all<{ tag: string; count: number }>()
     return Response.json({

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { PostMeta } from '@/content/posts'
@@ -21,7 +21,7 @@ interface TagFacet {
   count: number
 }
 
-const SEARCH_LIMIT = 20
+const DEFAULT_PER_PAGE = 20
 // Topics shown before "show more" — keeps the panel bounded when the
 // vocabulary grows with the archive (hundreds of topics at 10k essays).
 const INITIAL_FACETS = 10
@@ -52,13 +52,55 @@ async function fetchJson<T>(url: string): Promise<T> {
   }
 }
 
-function facetParams(query: string, tags: string[]): URLSearchParams {
+interface PagedResponse {
+  posts: ApiPostRow[]
+  total: number
+  page: number
+  totalPages: number
+}
+
+/** /api/search (text query present) and /api/posts (tag-only browsing)
+ *  share the same paged wire shape, so one function drives the pager for
+ *  both. Search ANDs the text query across tags; tag-only browsing ORs
+ *  within the facet — the route, not the client, decides which. */
+function fetchResultPage(
+  query: string,
+  tags: string[],
+  page: number,
+): Promise<PagedResponse> {
+  const path = query !== '' ? '/api/search' : '/api/posts'
+  return fetchJson<PagedResponse>(`${path}?${facetParams(query, tags, page)}`)
+}
+
+function describeResults(
+  total: number,
+  query: string,
+  tags: string[],
+): string {
+  const parts = [`${total} essay${total === 1 ? '' : 's'}`]
+  if (query !== '') {
+    parts.push(`matching “${query}”`)
+  }
+  if (tags.length > 0) {
+    parts.push(`in ${tags.map((t) => `“${t}”`).join(', ')}`)
+  }
+  return parts.join(' ')
+}
+
+function facetParams(
+  query: string,
+  tags: string[],
+  page?: number,
+): URLSearchParams {
   const params = new URLSearchParams()
   if (query !== '') {
     params.set('q', query)
   }
   for (const tag of tags) {
     params.append('tag', tag)
+  }
+  if (page !== undefined) {
+    params.set('page', String(page))
   }
   return params
 }
@@ -70,11 +112,12 @@ function facetParams(query: string, tags: string[]): URLSearchParams {
  * done) — plus full-text search. Reads listing metadata, facets, and
  * search hits from the D1-backed API routes — the client never holds more
  * than one page of posts, at any archive size. Tag filtering is OR within
- * the facet; a text query ANDs across it. Text search returns the top
- * SEARCH_LIMIT hits by bm25; tag-only browsing pages through /api/posts.
- * Filter state lives in the URL (?q= + repeated ?tag=) so filtered views
- * are shareable; the server-rendered first page (children) stays as the
- * SEO/no-JS baseline and the inactive view.
+ * the facet; a text query ANDs across it. Both text search and tag-only
+ * browsing page through the same DEFAULT_PER_PAGE-per-page contract
+ * (/api/search and /api/posts share page/perPage/totalPages/total).
+ * Filter state lives in the URL (?q= + repeated ?tag= + ?page=) so
+ * filtered views are shareable; the server-rendered first page (children)
+ * stays as the SEO/no-JS baseline and the inactive view.
  */
 export default function BlogSearch({
   children,
@@ -94,9 +137,17 @@ export default function BlogSearch({
   const [unavailable, setUnavailable] = useState(false)
   const [panelOpen, setPanelOpen] = useState(false)
   const [showAllFacets, setShowAllFacets] = useState(false)
+  // Consumed on the first fetch only, so a deep link like
+  // /blog?q=x&page=3 opens on page 3; every later filter change starts
+  // back at page 1 (a new filter invalidates any deep-linked page number).
+  const isFirstRun = useRef(true)
 
   const trimmed = query.trim()
   const filtering = trimmed !== '' || activeTags.length > 0
+  const initialPage = Math.max(
+    1,
+    Math.floor(Number(searchParams.get('page') ?? '1')) || 1,
+  )
 
   // Topic facets with counts, fetched once. Hidden (not faked) if down.
   useEffect(() => {
@@ -112,46 +163,26 @@ export default function BlogSearch({
       setUnavailable(false)
       return
     }
+    // Read once per effect run (see isFirstRun comment), not inside the
+    // timeout, so rapid typing before the debounce fires can't re-consume
+    // the deep-linked page number more than once.
+    const pageToFetch = isFirstRun.current ? initialPage : 1
+    isFirstRun.current = false
     let cancelled = false
     const timer = setTimeout(() => {
-      router.replace(`/blog?${facetParams(trimmed, activeTags)}`, {
-        scroll: false,
-      })
       const run = async () => {
         try {
-          if (trimmed !== '') {
-            const data = await fetchJson<{
-              posts: ApiPostRow[]
-            }>(`/api/search?${facetParams(trimmed, activeTags)}`)
-            if (cancelled) {
-              return
-            }
-            const ranked = data.posts.map(toMeta)
-            setResults(ranked)
-            setResultPage({ page: 1, totalPages: 1 })
-            const parts = [
-              `${ranked.length} of up to ${SEARCH_LIMIT} essays matching “${trimmed}”`,
-            ]
-            if (activeTags.length > 0) {
-              parts.push(`in ${activeTags.map((t) => `“${t}”`).join(', ')}`)
-            }
-            setResultMeta(parts.join(' '))
-          } else {
-            const data = await fetchJson<{
-              posts: ApiPostRow[]
-              page: number
-              totalPages: number
-              total: number
-            }>(`/api/posts?${facetParams('', activeTags)}&page=1`)
-            if (cancelled) {
-              return
-            }
-            setResults(data.posts.map(toMeta))
-            setResultPage({ page: data.page, totalPages: data.totalPages })
-            setResultMeta(
-              `${data.total} essay${data.total === 1 ? '' : 's'} in ${activeTags.map((t) => `“${t}”`).join(', ')}`,
-            )
+          const data = await fetchResultPage(trimmed, activeTags, pageToFetch)
+          if (cancelled) {
+            return
           }
+          router.replace(
+            `/blog?${facetParams(trimmed, activeTags, data.page)}`,
+            { scroll: false },
+          )
+          setResults(data.posts.map(toMeta))
+          setResultPage({ page: data.page, totalPages: data.totalPages })
+          setResultMeta(describeResults(data.total, trimmed, activeTags))
           setUnavailable(false)
         } catch {
           if (!cancelled) {
@@ -168,14 +199,14 @@ export default function BlogSearch({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, activeTags, filtering, trimmed])
 
-  const turnTagPage = (direction: 1 | -1) => {
+  const turnPage = (direction: 1 | -1) => {
     const next = resultPage.page + direction
-    fetchJson<{
-      posts: ApiPostRow[]
-      page: number
-      totalPages: number
-    }>(`/api/posts?${facetParams('', activeTags)}&page=${next}`)
+    fetchResultPage(trimmed, activeTags, next)
       .then((data) => {
+        router.replace(
+          `/blog?${facetParams(trimmed, activeTags, data.page)}`,
+          { scroll: false },
+        )
         setResults(data.posts.map(toMeta))
         setResultPage({ page: data.page, totalPages: data.totalPages })
         setUnavailable(false)
@@ -314,7 +345,7 @@ export default function BlogSearch({
                     {resultPage.page > 1 && (
                       <button
                         type="button"
-                        onClick={() => turnTagPage(-1)}
+                        onClick={() => turnPage(-1)}
                       >
                         ← Newer
                       </button>
@@ -325,7 +356,7 @@ export default function BlogSearch({
                     {resultPage.page < resultPage.totalPages && (
                       <button
                         type="button"
-                        onClick={() => turnTagPage(1)}
+                        onClick={() => turnPage(1)}
                       >
                         Older →
                       </button>

@@ -30,6 +30,11 @@ OpenNext. Canonical origin: `https://paulpan.net`
    duplicate FTS rows (observed: 3 posts → 6 FTS rows, every query doubled).
    Seeds must use explicit `DELETE` + `INSERT` pairs; the plain `DELETE`
    fires the sync trigger. Verified empirically, not from docs.
+5. `tags LIKE '%"x"%'` on the JSON column can't use an index — fine at
+   hundreds of rows, a real cost at 10k+. `post_tags` (migration `0004`)
+   is a normalized junction table (indexed on `tag`) kept in sync by
+   triggers + the seed script; routes filter with `EXISTS (... IN (...))`
+   against it, never LIKE.
 
 ## Conventions
 
@@ -72,18 +77,25 @@ OpenNext. Canonical origin: `https://paulpan.net`
 - Schema: `migrations/0001_search.sql` (posts + porter-stemmed FTS5 +
   sync triggers), `migrations/0002_metadata.sql` (metadata columns),
   `migrations/0003_fix_fts_triggers.sql` (plain-DELETE trigger bodies +
-  one-time rebuild — the pre-fix triggers used a no-op delete form).
+  one-time rebuild — the pre-fix triggers used a no-op delete form),
+  `migrations/0004_post_tags.sql` (`post_tags` junction table, indexed
+  on `tag`, backfilled + trigger-synced — see landmine 5).
   `cloudflare-env.d.ts` is force-tracked (generated, but
   fresh clones need it for `D1Database` types) — regenerate with
   `npm run cf-typegen` whenever bindings change and commit the result.
   Regenerate the seed after adding essays:
-  `node scripts/seed-search-db.mjs > d1/seed.sql`.
-- Reads: `/api/search` (FTS5 bm25, full metadata rows, optional `tag`),
-  `/api/posts` (paginated metadata, optional `tag`), `/api/tags`
-  (distinct topics). The client never holds more than one page; the
-  server-rendered first page stays the SEO/no-JS baseline. FTS5 MATCH
-  requires the table name, never an alias; D1 bind placeholders must stay
-  densely numbered; route files may only export route handlers.
+  `node scripts/seed-search-db.mjs > d1/seed.sql` (emits `post_tags`
+  DELETE+INSERT pairs alongside the `posts` row).
+- Reads: `/api/search` (FTS5 bm25, paginated — `page`/`per`, default 20,
+  max 100 — full metadata rows, optional repeated `tag`), `/api/posts`
+  (paginated metadata, optional repeated `tag`), `/api/tags` (topics with
+  per-topic `count`, for the facet panel). Repeated `?tag=` ORs within
+  the facet; a text query ANDs across it — this is a client convention
+  the routes enforce, not a UI choice. The client never holds more than
+  one page; the server-rendered first page stays the SEO/no-JS baseline.
+  FTS5 MATCH requires the table name, never an alias; D1 bind
+  placeholders must stay densely numbered; route files may only export
+  route handlers.
 - Without a database the APIs answer 503 + explicit `error` and the UI
   reports unavailability — never shadow results. (`next start` may or
   may not resolve the platform proxy at request time; the smoke shape
@@ -110,11 +122,15 @@ OpenNext. Canonical origin: `https://paulpan.net`
   scrolls and collapses past INITIAL_FACETS so a 10k-essay vocabulary
   stays bounded) + search box (FTS5 bm25 ranking over
   quoted per-token prefix matches, all tokens ANDed; tokens must be ≥2
-  chars, max 8 per query; top 20 hits). Tag-only browsing pages through
-  `/api/posts`; `/api/tags` returns `{tag, count}` rows. Filter state
-  lives in the URL (`?q=` + repeated `?tag=`), so `BlogSearch` reads
+  chars, max 8 per query). Both text search and tag-only browsing page
+  through the same shape (`page`/`perPage`/`totalPages`/`total`) — the
+  client's `fetchResultPage` picks `/api/search` or `/api/posts` by
+  whether there's a text query, never both. Filter state (`?q=` +
+  repeated `?tag=` + `?page=`) lives in the URL, so `BlogSearch` reads
   `useSearchParams` and needs a Suspense boundary in `blog/page.tsx`.
-  RSS capped at the 20 latest. Smoke tests
+  A deep-linked page number is honored on first load only; any later
+  filter change resets to page 1 (a new filter invalidates it). RSS
+  capped at the 20 latest. Smoke tests
   enumerate all routes up to 25 posts, then sample deterministically.
 - Scale, measured 2026-09-24 with 500 synthetic posts in a scratch copy:
   full build <2 min, 510 static pages, First Load JS unchanged at ~107 kB
@@ -141,8 +157,9 @@ OpenNext. Canonical origin: `https://paulpan.net`
    deploy that must serve the new post). Listing, search, and tags read
    D1 exclusively — an unseeded post is invisible to all three.
 5. The index page shows 20 essays per screen (`?page=N`) with year
-   subheads, tag chips, and a search box, all backed by the `/api/posts`,
-   `/api/tags`, and `/api/search` routes.
+   subheads, a Filters panel (topic checkboxes + counts), and a search
+   box, all backed by the `/api/posts`, `/api/tags`, and `/api/search`
+   routes.
 6. `source: 'd1'` / `'d1-fts5'` in API responses proves the tier — curl
    prod to check. The D1 path is covered by `tests/search-d1.spec.ts`,
    gated on SEARCH_API_URL (skipped without it).
