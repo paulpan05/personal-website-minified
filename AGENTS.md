@@ -13,6 +13,11 @@ OpenNext. Canonical origin: `https://paulpan.net`
 - Cloudflare dashboard Build command must be
   `npx @opennextjs/cloudflare build`. `npm run preview` serves the Worker
   build locally on `:8787` — kill it and any `workerd` leftovers when done.
+- Kill servers by port (`kill $(lsof -ti :3100)`, same for `:8787`),
+  never by pid file: a cleaned `/tmp` makes the kill silently no-op while
+  the old server keeps the port, so the new server never binds and probes
+  hit stale content (observed — screenshots passed against the wrong
+  build). After killing, verify the port is clear before restarting.
 
 ## Landmines (learned the hard way)
 
