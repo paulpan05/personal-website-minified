@@ -1,27 +1,31 @@
 import '@/styles/reset.scss'
 import '@/styles/globals.scss'
 import type { Metadata } from 'next'
-import { SITE_URL } from '@/lib/site'
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_OG_IMAGE,
+  SITE_URL,
+} from '@/lib/site'
 import SiteNav from '@/components/SiteNav/SiteNav'
 import SiteFooter from '@/components/SiteFooter/SiteFooter'
 import BackToTop from '@/components/BackToTop/BackToTop'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Paul's Main Website",
-  description:
-    'Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, writing, and contact info.',
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "Paul's Main Website",
-    description:
-      "Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, writing, and contact info.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     type: 'website',
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: 'summary',
-    title: "Paul's Main Website",
-    description:
-      "Paul Pan — software engineer at Meta Reality Labs. Experience, highlighted projects, writing, and contact info.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [SITE_OG_IMAGE.url],
   },
   icons: {
     icon: [
@@ -33,6 +37,8 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.json',
   alternates: {
+    // Relative to each route, so every page names itself as canonical on SITE_URL.
+    canonical: './',
     types: {
       'application/rss+xml': [{ url: '/blog/rss.xml', title: "Writing" }],
     },

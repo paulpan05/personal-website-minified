@@ -8,7 +8,7 @@ import {
   getPostSlugs,
   loadPostContent,
 } from '@/content/posts'
-import { SITE_AUTHOR, SITE_URL } from '@/lib/site'
+import { SITE_AUTHOR, SITE_OG_IMAGE, SITE_URL } from '@/lib/site'
 
 interface PostPageParams {
   slug: string
@@ -42,11 +42,13 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       authors: [SITE_AUTHOR],
       url,
+      images: [SITE_OG_IMAGE],
     },
     twitter: {
       card: 'summary',
       title: post.title,
       description: post.description,
+      images: [SITE_OG_IMAGE.url],
     },
   }
 }

@@ -1,12 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { repoLink } from '@/data/paragraphs'
-import {
-  ProfileIconLinks,
-  OldEmail,
-  NewEmail,
-  PhoneNumber,
-} from '@/data/infos'
+import { ProfileIconLinks, NewEmail } from '@/data/infos'
 
 const SECTION_LINKS = [
   { label: 'About', href: '/#about' },
@@ -17,7 +12,6 @@ const SECTION_LINKS = [
 ]
 
 export default function SiteFooter() {
-  const phoneHref = `tel:${PhoneNumber.replace(/[^+\d]/g, '')}`
   return (
     <footer className="site-footer">
       <Link href="/" className="site-wordmark" aria-label="Home">
@@ -61,16 +55,8 @@ export default function SiteFooter() {
           ))}
         </div>
         <p>
-          <b>Primary email: </b>
+          <b>Email: </b>
           <a href={`mailto:${NewEmail}`}>{NewEmail}</a>
-        </p>
-        <p>
-          <b>Legacy email: </b>
-          <a href={`mailto:${OldEmail}`}>{OldEmail}</a>
-        </p>
-        <p>
-          <b>Phone Number: </b>
-          <a href={phoneHref}>{PhoneNumber}</a>
         </p>
       </section>
       <span className="site-links">
