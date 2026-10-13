@@ -40,9 +40,9 @@ export const highlightedProjectsCards: HighlightedProjectCard[] = [
   {
     shortDescription: "BibleDevos",
     mediumDescription:
-      "Shipped scripture-linked study-notes app on web and iOS, with real-time group collaboration and offline-first reading (Android on Google Play)",
+      "Shipped scripture-linked study-notes app on web, iOS, and Android, with real-time group collaboration and offline-first reading",
     longDescription:
-      "Notes stay anchored to the passages that inspired them: single verses, ranges, and cross-chapter references that open the full text in context. Notes can be shared privately with users or study groups, discussed through real-time comments, or published publicly for discovery. The web reader offers 47 public-domain translations; the native apps bundle KJV and ASV and cache content for offline use; sign-in is email or Google, plus Apple on iOS. The same product ships as a web app and a native iOS app; the Android build is on Google Play.",
+      "Notes stay anchored to the passages that inspired them: single verses, ranges, and cross-chapter references that open the full text in context. Notes can be shared privately with users or study groups, discussed through real-time comments, or published publicly for discovery. The web reader offers 47 public-domain translations; the native apps bundle KJV and ASV and cache content for offline use; sign-in is email or Google, plus Apple on iOS. The same product ships as a web app and as native iOS and Android apps.",
     links: [
       { label: "web app", url: "https://bibledevos.com/" },
       {
