@@ -4,7 +4,7 @@
  * time, bundle sizes, and index size at scale. Usage:
  *   scripts/gen-fixture-posts.mjs <repo-copy-dir> <count>
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const [, , repoDir, countRaw] = process.argv

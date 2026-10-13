@@ -1,5 +1,5 @@
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://paulpan.net'
-export const SITE_NAME = "Paul's Main Website"
+export const SITE_NAME = 'Paul Pan'
 export const SITE_AUTHOR = 'Paul Pan'
 export const SITE_DESCRIPTION =
   'Paul Pan — Senior Software Engineer at Meta (Applied AI). Experience, highlighted projects, writing, and contact info.'

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "pretest": "playwright install chromium",
     "test": "next build && playwright test",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
@@ -35,5 +35,10 @@
     "sass": "^1.89.0",
     "typescript": "^5.8.3",
     "wrangler": "^4.68.1"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "^8.5.23"
+    }
   }
 }

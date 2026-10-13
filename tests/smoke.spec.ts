@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { getPostSlugs } from "../src/content/posts";
+import { getAllPosts, getPostSlugs } from "../src/content/posts";
 
 // Post routes derive from the POST_DEFS registry, so new posts are covered
 // automatically. (The .mdx imports in posts.ts are lazy and never execute
@@ -58,4 +58,22 @@ test("no horizontal overflow at mobile width", async ({ page }) => {
 		);
 		expect(overflow, route).toBeLessThanOrEqual(1);
 	}
+});
+
+// lastmod must track content, not the request time: a fresh `new Date()` per
+// crawl claims every page changed on every visit.
+test("sitemap lastmod is the newest essay date, not the request time", async ({
+	request,
+	baseURL,
+}) => {
+	const xml = await (await request.get(`${baseURL}/sitemap.xml`)).text();
+	const newest = getAllPosts()
+		.map((post) => new Date(post.publishedAt).getTime())
+		.reduce((a, b) => Math.max(a, b));
+	const lastmods = [...xml.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);
+	expect(lastmods.length).toBeGreaterThan(0);
+	for (const lastmod of lastmods.slice(0, 2)) {
+		expect(new Date(lastmod).getTime()).toBe(newest);
+	}
+	expect(Date.now() - newest).toBeGreaterThan(60_000);
 });

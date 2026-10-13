@@ -21,7 +21,6 @@ interface TagFacet {
   count: number
 }
 
-const DEFAULT_PER_PAGE = 20
 // Topics shown before "show more" — keeps the panel bounded when the
 // vocabulary grows with the archive (hundreds of topics at 10k essays).
 const INITIAL_FACETS = 10
@@ -113,7 +112,7 @@ function facetParams(
  * search hits from the D1-backed API routes — the client never holds more
  * than one page of posts, at any archive size. Tag filtering is OR within
  * the facet; a text query ANDs across it. Both text search and tag-only
- * browsing page through the same DEFAULT_PER_PAGE-per-page contract
+ * browsing page through the same default 20-per-page contract
  * (/api/search and /api/posts share page/perPage/totalPages/total).
  * Filter state lives in the URL (?q= + repeated ?tag= + ?page=) so
  * filtered views are shareable; the server-rendered first page (children)

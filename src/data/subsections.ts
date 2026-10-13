@@ -40,14 +40,18 @@ export const highlightedProjectsCards: HighlightedProjectCard[] = [
   {
     shortDescription: "BibleDevos",
     mediumDescription:
-      "Shipped scripture-linked study-notes app on web and iOS, with real-time group collaboration and offline-first reading (Android in closed testing)",
+      "Shipped scripture-linked study-notes app on web and iOS, with real-time group collaboration and offline-first reading (Android on Google Play)",
     longDescription:
-      "Notes stay anchored to the passages that inspired them: single verses, ranges, and cross-chapter references that open the full text in context. Notes can be shared privately with users or study groups, discussed through real-time comments, or published publicly for discovery. The web reader offers 47 public-domain translations; the native apps bundle KJV and ASV, cache content for offline use, and sign in with email, Google, or Apple. The same product ships as a web app and a native iOS app; the Android build is in closed testing (Play approval pending the 12-tester requirement).",
+      "Notes stay anchored to the passages that inspired them: single verses, ranges, and cross-chapter references that open the full text in context. Notes can be shared privately with users or study groups, discussed through real-time comments, or published publicly for discovery. The web reader offers 47 public-domain translations; the native apps bundle KJV and ASV and cache content for offline use; sign-in is email or Google, plus Apple on iOS. The same product ships as a web app and a native iOS app; the Android build is on Google Play.",
     links: [
       { label: "web app", url: "https://bibledevos.com/" },
       {
         label: "App Store",
         url: "https://apps.apple.com/us/app/bibledevos/id6759275734",
+      },
+      {
+        label: "Google Play",
+        url: "https://play.google.com/store/apps/details?id=com.paulpan.bibledevos",
       },
     ],
   },
